@@ -1,0 +1,1242 @@
+<!DOCTYPE html>
+<!-- saved from url=(0055)file:///C:/Users/Cyrus/Downloads/zenith_complete_1.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Zenith — AI Code Security Platform</title>
+<link href="./Zenith — AI Code Security Platform_files/css2" rel="stylesheet">
+<style>
+*,::before,::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#07080d; --s1:#0c0e14; --s2:#111520; --s3:#171c2a; --s4:#1d2336;
+  --bd0:rgba(255,255,255,.06); --bd1:rgba(255,255,255,.11); --bd2:rgba(255,255,255,.18);
+  --c:#00c4f4; --cd:rgba(0,196,244,.1); --cg:rgba(0,196,244,.18);
+  --g:#10e878; --gd:rgba(16,232,120,.1);
+  --r:#ff3355; --rd:rgba(255,51,85,.1);
+  --a:#ffb800; --ad:rgba(255,184,0,.1);
+  --p:#b47fff; --pd:rgba(180,127,255,.1);
+  --t0:#edf0fc; --t1:#8090b8; --t2:#3c4a68; --t3:#1c2440;
+  --mono:'Geist Mono',monospace; --disp:'Bricolage Grotesque',sans-serif; --body:'DM Sans',sans-serif;
+}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t0);font-family:var(--body);font-size:13px;line-height:1.6}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--s4);border-radius:2px}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background-image:radial-gradient(circle,rgba(255,255,255,.022) 1px,transparent 1px);background-size:24px 24px}
+body::after{content:'';position:fixed;top:-80px;left:-80px;width:500px;height:500px;background:radial-gradient(circle at 30% 30%,rgba(0,196,244,.055) 0%,transparent 65%);pointer-events:none;z-index:0}
+#app{position:relative;z-index:1;height:100vh;display:flex;flex-direction:column}
+
+/* ═══ TOPBAR ═══ */
+.tb{display:flex;align-items:center;height:52px;flex-shrink:0;background:rgba(7,8,13,.97);border-bottom:1px solid var(--bd0);backdrop-filter:blur(20px);z-index:30}
+.tb-logo{display:flex;align-items:center;gap:10px;padding:0 20px;height:100%;width:260px;border-right:1px solid var(--bd0);flex-shrink:0;cursor:pointer}
+.tb-logo:hover .logo-name{color:var(--c)}
+.logo-hex{width:28px;height:28px;flex-shrink:0;background:var(--c);clip-path:polygon(50% 0%,93% 25%,93% 75%,50% 100%,7% 75%,7% 25%);display:flex;align-items:center;justify-content:center;transition:transform .3s}
+.tb-logo:hover .logo-hex{transform:rotate(30deg)}
+.logo-hex::after{content:'';width:10px;height:10px;background:var(--bg);clip-path:polygon(50% 0%,93% 25%,93% 75%,50% 100%,7% 75%,7% 25%)}
+.logo-name{font-family:var(--disp);font-size:17px;font-weight:800;color:#fff;letter-spacing:-.5px;transition:color .2s}
+.logo-ver{font-family:var(--mono);font-size:9px;color:var(--t2);letter-spacing:.5px;margin-top:1px}
+.tb-nav{display:flex;height:100%;padding:0 4px;gap:0}
+.tb-btn{height:100%;padding:0 16px;font-family:var(--mono);font-size:11px;letter-spacing:.5px;text-transform:uppercase;color:var(--t2);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;transition:color .14s,border-color .14s;white-space:nowrap}
+.tb-btn:hover{color:var(--t1)}
+.tb-btn.on{color:var(--c);border-bottom-color:var(--c)}
+.tb-right{display:flex;align-items:center;gap:10px;margin-left:auto;padding:0 18px;height:100%;border-left:1px solid var(--bd0)}
+.ws-pill{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10px;color:var(--t2);padding:4px 11px;border:1px solid var(--bd0);border-radius:999px}
+.ws-dot{width:6px;height:6px;border-radius:50%;background:var(--t3);transition:background .3s}
+.ws-dot.on{background:var(--g);box-shadow:0 0 5px var(--g);animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.threat-chip{font-family:var(--mono);font-size:10px;letter-spacing:.5px;text-transform:uppercase;padding:4px 10px;border:1px solid var(--bd0);border-radius:3px;color:var(--t2);transition:all .4s}
+.threat-chip[data-l="HIGH"],.threat-chip[data-l="CRITICAL"]{border-color:var(--r);color:var(--r);background:var(--rd)}
+.threat-chip[data-l="MEDIUM"]{border-color:var(--a);color:var(--a);background:var(--ad)}
+.threat-chip[data-l="LOW"]{border-color:var(--g);color:var(--g);background:var(--gd)}
+.tb-clk{font-family:var(--mono);font-size:10px;color:var(--t2)}
+
+/* ═══ SCREENS ═══ */
+.screen{display:none;flex:1;overflow:hidden}
+.screen.on{display:flex;flex-direction:column}
+
+/* ═══════════════════════════════════
+   IMPORT SCREEN
+═══════════════════════════════════ */
+.import-screen{background:var(--bg);overflow-y:auto;align-items:center;justify-content:flex-start;padding:48px 24px 80px}
+.import-center{width:100%;max-width:640px;margin:0 auto}
+.import-hero{margin-bottom:40px;text-align:center}
+.import-hero h1{font-family:var(--disp);font-size:32px;font-weight:900;color:#fff;letter-spacing:-1px;line-height:1.1;margin-bottom:10px}
+.import-hero h1 span{color:var(--c)}
+.import-hero p{font-size:14px;color:var(--t1);line-height:1.75;max-width:480px;margin:0 auto}
+
+.import-tabs{display:flex;border:1px solid var(--bd0);border-radius:10px;overflow:hidden;margin-bottom:24px;background:var(--s1)}
+.itab{flex:1;padding:11px 0;font-family:var(--mono);font-size:11px;letter-spacing:.5px;text-transform:uppercase;text-align:center;cursor:pointer;background:none;border:none;color:var(--t2);transition:all .15s;display:flex;align-items:center;justify-content:center;gap:7px}
+.itab:not(:last-child){border-right:1px solid var(--bd0)}
+.itab:hover{color:var(--t0);background:var(--s2)}
+.itab.on{color:var(--c);background:var(--cd)}
+.itab svg{opacity:.7}
+.itab.on svg{opacity:1}
+
+.ipanel{display:none}
+.ipanel.on{display:block}
+
+/* GitHub panel */
+.gh-input-row{display:flex;gap:8px;margin-bottom:16px}
+.gh-prefix{display:flex;align-items:center;gap:7px;padding:0 12px;background:var(--s2);border:1px solid var(--bd0);border-radius:8px;font-family:var(--mono);font-size:11px;color:var(--t2);white-space:nowrap;flex-shrink:0}
+.gh-input{flex:1;padding:10px 13px;background:var(--s2);border:1px solid var(--bd0);border-radius:8px;font-family:var(--mono);font-size:12px;color:var(--t0);outline:none;transition:border-color .18s}
+.gh-input:focus{border-color:var(--c)}
+.gh-input::placeholder{color:var(--t2);font-family:var(--body)}
+.clone-btn{padding:10px 20px;background:var(--c);color:var(--bg);border:none;border-radius:8px;font-family:var(--mono);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;transition:opacity .15s,transform .1s;display:flex;align-items:center;gap:7px;flex-shrink:0}
+.clone-btn:hover{opacity:.87}
+.clone-btn:active{transform:scale(.97)}
+.clone-btn:disabled{opacity:.35;cursor:not-allowed}
+
+/* Recent repos */
+.recent-label{font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--t2);margin-bottom:8px}
+.repo-list{display:flex;flex-direction:column;gap:4px;margin-bottom:20px}
+.repo-item{display:flex;align-items:center;gap:11px;padding:10px 13px;background:var(--s1);border:1px solid var(--bd0);border-radius:10px;cursor:pointer;transition:all .14s}
+.repo-item:hover{background:var(--s2);border-color:var(--bd1)}
+.repo-item.selected{background:var(--cd);border-color:var(--c)}
+.repo-ico{width:30px;height:30px;border-radius:7px;background:var(--s3);border:1px solid var(--bd0);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.repo-name{font-family:var(--mono);font-size:12px;color:var(--t0);flex:1}
+.repo-item.selected .repo-name{color:var(--c)}
+.repo-meta{font-size:11px;color:var(--t2)}
+.repo-lang{font-family:var(--mono);font-size:10px;padding:2px 8px;border-radius:999px;background:var(--s3);border:1px solid var(--bd0);color:var(--t1)}
+
+/* Progress */
+.progress-wrap{margin-top:4px}
+.prog-track{height:3px;background:var(--s4);border-radius:999px;overflow:hidden;margin-bottom:12px}
+.prog-fill{height:100%;background:var(--c);border-radius:999px;transition:width .4s ease}
+.prog-steps{display:flex;flex-direction:column;gap:6px}
+.prog-step{display:flex;align-items:center;gap:9px;font-family:var(--mono);font-size:11px;color:var(--t2);transition:color .2s}
+.prog-step.done{color:var(--g)}
+.prog-step.active{color:var(--t0)}
+.step-dot{width:6px;height:6px;border-radius:50%;background:var(--s4);flex-shrink:0;transition:background .2s}
+.prog-step.done .step-dot{background:var(--g)}
+.prog-step.active .step-dot{background:var(--c);animation:sdot 1s infinite}
+@keyframes sdot{0%,100%{opacity:1}50%{opacity:.25}}
+
+/* Success banner */
+.success-banner{display:none;margin-top:16px;padding:14px 16px;border:1px solid rgba(16,232,120,.3);border-radius:10px;background:rgba(16,232,120,.07);align-items:center;gap:12px}
+.success-banner.on{display:flex}
+.success-text h4{font-size:13px;font-weight:500;color:var(--g);margin-bottom:2px}
+.success-text p{font-size:12px;color:var(--t1)}
+.scan-now-btn{margin-left:auto;padding:9px 20px;background:var(--c);color:var(--bg);border:none;border-radius:8px;font-family:var(--mono);font-size:12px;font-weight:600;cursor:pointer;flex-shrink:0;transition:opacity .14s,transform .1s;white-space:nowrap}
+.scan-now-btn:hover{opacity:.87}
+.scan-now-btn:active{transform:scale(.97)}
+
+/* Folder panel */
+.drop-zone{border:1.5px dashed var(--bd1);border-radius:12px;padding:40px 24px;text-align:center;cursor:pointer;transition:all .15s;position:relative}
+.drop-zone:hover,.drop-zone.over{background:var(--s2);border-color:var(--c)}
+.drop-ico{width:48px;height:48px;border-radius:10px;background:var(--s2);border:1px solid var(--bd0);display:flex;align-items:center;justify-content:center;margin:0 auto 14px}
+.drop-zone h3{font-family:var(--disp);font-size:15px;font-weight:700;color:#fff;margin-bottom:5px}
+.drop-zone p{font-size:13px;color:var(--t1);margin-bottom:18px}
+.browse-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border:1px solid var(--bd1);border-radius:8px;font-size:13px;color:var(--t0);cursor:pointer;background:var(--s2);transition:all .14s;font-family:var(--body)}
+.browse-btn:hover{border-color:var(--c);color:var(--c)}
+.file-types{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;margin-top:16px}
+.ftype{font-family:var(--mono);font-size:10px;color:var(--t2);background:var(--s2);border:1px solid var(--bd0);padding:2px 8px;border-radius:999px}
+input[type=file]{display:none}
+
+.file-preview{display:none;margin-top:14px}
+.file-preview.on{display:block}
+.fp-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.fp-title{font-size:13px;font-weight:500;color:var(--t0)}
+.fp-clear{font-size:12px;color:var(--r);background:none;border:none;cursor:pointer;padding:0}
+.file-list{display:flex;flex-direction:column;gap:3px;max-height:160px;overflow-y:auto}
+.file-entry{display:flex;align-items:center;gap:8px;padding:6px 10px;background:var(--s2);border-radius:6px;font-family:var(--mono);font-size:11px;color:var(--t0)}
+.file-sz{margin-left:auto;color:var(--t2);font-size:10px}
+
+.privacy-note{margin-top:16px;padding:12px 14px;background:var(--s2);border:1px solid var(--bd0);border-radius:8px;font-size:12px;color:var(--t1);line-height:1.65}
+.privacy-note strong{color:var(--t0);font-weight:500}
+
+/* ═══════════════════════════════════
+   MAIN APP SCREEN
+═══════════════════════════════════ */
+.app-screen{flex-direction:row}
+.sidebar{background:var(--s1);border-right:1px solid var(--bd0);display:flex;flex-direction:column;overflow:hidden;width:260px;flex-shrink:0}
+.sb-sec{padding:13px;border-bottom:1px solid var(--bd0)}
+.sb-lbl{font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--t2);margin-bottom:9px}
+
+/* Project card in sidebar */
+.project-card{background:var(--s2);border:1px solid var(--bd0);border-radius:8px;padding:10px 12px;margin-bottom:10px;display:flex;align-items:center;gap:10px;position:relative}
+.project-card .pc-icon{width:30px;height:30px;border-radius:6px;background:var(--cd);border:1px solid var(--c);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.project-card .pc-name{font-family:var(--mono);font-size:11px;color:var(--c);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+.project-card .pc-type{font-family:var(--mono);font-size:9px;color:var(--t2);margin-top:2px}
+.change-project-btn{width:100%;padding:8px;border-radius:8px;background:none;border:1px solid var(--bd0);font-family:var(--mono);font-size:10px;color:var(--t1);cursor:pointer;transition:all .14s;letter-spacing:.3px}
+.change-project-btn:hover{border-color:var(--c);color:var(--c)}
+
+.run-btn{width:100%;padding:10px;border-radius:8px;background:var(--c);color:var(--bg);font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.5px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;transition:opacity .14s,transform .1s}
+.run-btn:hover{opacity:.87}
+.run-btn:active{transform:scale(.97)}
+.run-btn:disabled{opacity:.32;cursor:not-allowed;transform:none}
+.btn-spin{width:13px;height:13px;border:2px solid rgba(7,8,13,.22);border-top-color:var(--bg);border-radius:50%;animation:spin .6s linear infinite;display:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.model-list{display:flex;flex-direction:column;gap:3px}
+.mrow{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:8px;border:1px solid transparent;cursor:pointer;transition:all .13s}
+.mrow:hover{background:var(--s3)}
+.mrow.on{background:var(--cd);border-color:var(--c)}
+.mdot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.mname{font-family:var(--mono);font-size:11px;color:var(--t0);flex:1}
+.mrow.on .mname{color:var(--c)}
+.msub{font-size:10px;color:var(--t2)}
+.mcost{font-family:var(--mono);font-size:9px;color:var(--t2)}
+
+.key-pool{display:flex;flex-direction:column;gap:4px}
+.krow{display:flex;align-items:center;gap:7px}
+.klbl{font-family:var(--mono);font-size:9px;color:var(--t2);width:28px;flex-shrink:0}
+.ktrack{flex:1;height:3px;background:var(--s4);border-radius:2px;overflow:hidden}
+.kfill{height:100%;border-radius:2px;transition:width .8s ease}
+.kfill.ok{background:var(--g)}.kfill.w{background:var(--a)}.kfill.x{background:var(--r)}
+.kpct{font-family:var(--mono);font-size:9px;width:24px;text-align:right}
+.kpct.ok{color:var(--g)}.kpct.w{color:var(--a)}.kpct.x{color:var(--r)}
+
+.dspy-list{display:flex;flex-direction:column;gap:3px;overflow-y:auto;flex:1}
+.dspy-item{display:flex;align-items:center;gap:7px;padding:6px 8px;border-radius:8px;background:var(--s2);border:1px solid var(--bd0);transition:all .22s}
+.dspy-item.lit{background:var(--cd);border-color:var(--c)}
+.db{font-family:var(--mono);font-size:9px;padding:1px 5px;border-radius:3px;flex-shrink:0}
+.db.sig{background:var(--pd);color:var(--p)}.db.cot{background:var(--cd);color:var(--c)}.db.rag{background:var(--gd);color:var(--g)}.db.lm{background:var(--ad);color:var(--a)}.db.sbx{background:var(--rd);color:var(--r)}
+.dspy-name{font-size:11px;color:var(--t0);flex:1}
+.dspy-item.lit .dspy-name{color:var(--c)}
+
+.sb-footer{margin-top:auto;padding:12px;border-top:1px solid var(--bd0);display:flex;flex-direction:column;gap:6px}
+.ghost-btn{width:100%;padding:9px;border-radius:8px;background:none;border:1px solid var(--bd0);font-family:var(--mono);font-size:10px;color:var(--t1);cursor:pointer;transition:all .13s;letter-spacing:.3px}
+.ghost-btn:hover{border-color:var(--c);color:var(--c)}
+
+/* ═══ CONTENT ═══ */
+.content{display:flex;flex-direction:column;overflow:hidden;flex:1}
+.vbar{display:flex;background:var(--s1);border-bottom:1px solid var(--bd0);padding:0 18px;flex-shrink:0}
+.vt{padding:10px 14px;font-family:var(--mono);font-size:11px;letter-spacing:.5px;text-transform:uppercase;color:var(--t2);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;transition:all .13s;white-space:nowrap}
+.vt:hover{color:var(--t1)}
+.vt.on{color:var(--c);border-bottom-color:var(--c)}
+.vpane{display:none;flex:1;overflow-y:auto;padding:24px}
+.vpane.on{display:block}
+
+/* ═══ PIPELINE ═══ */
+.pipe-canvas{max-width:800px;margin:0 auto;display:flex;flex-direction:column}
+.src-node{background:var(--s2);border:1px solid var(--bd0);border-radius:12px;padding:14px 18px;display:flex;align-items:center;gap:13px;transition:border-color .3s}
+.src-node.live{border-color:var(--c)}
+.src-ico{width:38px;height:38px;border-radius:8px;background:var(--s3);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.src-text h4{font-family:var(--disp);font-size:13px;font-weight:700;color:#fff}
+.src-text p{font-family:var(--mono);font-size:11px;color:var(--t2);margin-top:2px;max-width:380px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.src-badge{margin-left:auto;font-family:var(--mono);font-size:10px;padding:3px 10px;border-radius:999px;border:1px solid var(--c);color:var(--c);background:var(--cd);display:none;flex-shrink:0}
+.src-node.live .src-badge{display:block}
+
+.conn{width:2px;height:24px;background:var(--bd0);margin:0 auto;position:relative;transition:background .38s}
+.conn.on{background:var(--c)}
+.conn::after{content:'';position:absolute;bottom:-5px;left:-4px;border-left:5px solid transparent;border-right:5px solid transparent;border-top:7px solid var(--bd0);transition:border-top-color .38s}
+.conn.on::after{border-top-color:var(--c)}
+
+.mc{background:var(--s1);border:1px solid var(--bd0);border-radius:12px;overflow:hidden;position:relative;transition:border-color .28s,box-shadow .28s}
+.mc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--bd0);transition:background .28s}
+.mc[data-s="run"]{border-color:var(--a);box-shadow:0 0 22px rgba(255,184,0,.06)}
+.mc[data-s="run"]::before{background:var(--a)}
+.mc[data-s="pass"]{border-color:var(--g)}
+.mc[data-s="pass"]::before{background:var(--g)}
+.mc[data-s="fail"]{border-color:var(--r)}
+.mc[data-s="fail"]::before{background:var(--r)}
+.mc[data-s="skip"]{opacity:.42}
+.mc-h{display:grid;grid-template-columns:36px 1fr auto auto;align-items:center;gap:11px;padding:13px 17px;border-bottom:1px solid var(--bd0)}
+.mc-n{width:32px;height:32px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:13px;font-weight:600;background:var(--s3);color:var(--t2);flex-shrink:0;transition:all .28s}
+.mc[data-s="run"] .mc-n{background:var(--ad);color:var(--a)}
+.mc[data-s="pass"] .mc-n{background:var(--gd);color:var(--g)}
+.mc[data-s="fail"] .mc-n{background:var(--rd);color:var(--r)}
+.mc-title{font-family:var(--disp);font-size:13px;font-weight:700;color:#fff}
+.mc-sub{font-family:var(--mono);font-size:10px;color:var(--t2);margin-top:2px}
+.mc-tag{font-family:var(--mono);font-size:9px;letter-spacing:.5px;text-transform:uppercase;padding:3px 8px;border-radius:3px;border:1px solid var(--bd0);color:var(--t2);white-space:nowrap;transition:all .28s}
+.mc[data-s="run"] .mc-tag{border-color:var(--a);color:var(--a);background:var(--ad)}
+.mc[data-s="pass"] .mc-tag{border-color:var(--g);color:var(--g);background:var(--gd)}
+.mc[data-s="fail"] .mc-tag{border-color:var(--r);color:var(--r);background:var(--rd)}
+.mc-spin{width:14px;height:14px;border:2px solid var(--s3);border-top-color:var(--a);border-radius:50%;animation:spin .6s linear infinite;display:none;flex-shrink:0}
+.mc[data-s="run"] .mc-spin{display:block}
+.mc-body{padding:13px 17px;min-height:48px}
+
+.flist{display:flex;flex-direction:column;gap:4px}
+.fnd{display:flex;align-items:flex-start;gap:9px;padding:8px 11px;border-radius:8px;border:1px solid;font-size:12px;line-height:1.5;animation:fdin .22s ease}
+@keyframes fdin{from{opacity:0;transform:translateY(-2px)}to{opacity:1;transform:translateY(0)}}
+.fnd.CRITICAL{background:rgba(255,51,85,.07);border-color:rgba(255,51,85,.22)}
+.fnd.HIGH{background:rgba(255,51,85,.05);border-color:rgba(255,51,85,.15)}
+.fnd.MEDIUM{background:rgba(255,184,0,.06);border-color:rgba(255,184,0,.15)}
+.fnd.LOW{background:rgba(0,196,244,.04);border-color:rgba(0,196,244,.12)}
+.fnd.CLEAN{background:rgba(16,232,120,.05);border-color:rgba(16,232,120,.15)}
+.fnd.INFO{background:var(--s2);border-color:var(--bd0)}
+.fsev{font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;padding:2px 6px;border-radius:3px;flex-shrink:0;margin-top:2px}
+.fnd.CRITICAL .fsev,.fnd.HIGH .fsev{background:rgba(255,51,85,.18);color:var(--r)}
+.fnd.MEDIUM .fsev{background:rgba(255,184,0,.13);color:var(--a)}
+.fnd.LOW .fsev{background:rgba(0,196,244,.1);color:var(--c)}
+.fnd.CLEAN .fsev{background:rgba(16,232,120,.12);color:var(--g)}
+.fnd.INFO .fsev{background:var(--s3);color:var(--t1)}
+.fmsg{color:var(--t0)}.frule{font-family:var(--mono);font-size:10px;color:var(--t2);margin-top:2px}
+.fsnip{font-family:var(--mono);font-size:11px;color:var(--r);background:var(--s2);border:1px solid var(--bd0);padding:4px 8px;border-radius:4px;margin-top:5px;white-space:pre;overflow-x:auto;display:block}
+
+.clash-row{display:flex;gap:5px;flex-wrap:wrap;margin-top:4px}
+.cc{display:flex;align-items:center;gap:4px;padding:4px 10px;border-radius:7px;border:1px solid;font-family:var(--mono);font-size:11px;animation:fdin .2s ease}
+.cc.red{background:var(--rd);border-color:rgba(255,51,85,.3);color:var(--r)}
+.cc.blue{background:var(--cd);border-color:rgba(0,196,244,.25);color:var(--c)}
+.cc.sbx{background:var(--pd);border-color:rgba(180,127,255,.25);color:var(--p)}
+.cc.win{background:var(--gd);border-color:rgba(16,232,120,.3);color:var(--g)}
+.cc.lose{background:var(--ad);border-color:rgba(255,184,0,.3);color:var(--a)}
+
+.diff-block{font-family:var(--mono);font-size:11px;line-height:1.8;background:var(--bg);border:1px solid var(--bd0);border-radius:8px;padding:12px 14px;margin-top:8px;overflow-x:auto}
+.dl{display:block;white-space:pre;padding:1px 4px;border-radius:3px}
+.dl.rm{color:var(--r);background:rgba(255,51,85,.07)}.dl.add{color:var(--g);background:rgba(16,232,120,.07)}.dl.ctx{color:var(--t2)}
+
+.legend-row{display:flex;gap:14px;flex-wrap:wrap;padding:12px 0 0;font-family:var(--mono);font-size:10px;color:var(--t2)}
+.li{display:flex;align-items:center;gap:4px}.ld{width:7px;height:7px;border-radius:50%}
+.empty{text-align:center;padding:18px;font-family:var(--mono);font-size:11px;color:var(--t2)}
+
+/* ═══ CHAT ═══ */
+.chat-shell{max-width:800px;margin:0 auto;display:flex;flex-direction:column;height:calc(100vh - 120px)}
+.chat-hdr{background:var(--s2);border:1px solid var(--bd0);border-radius:12px;padding:16px;display:flex;gap:12px;align-items:center;flex-shrink:0;margin-bottom:14px}
+.ai-av{width:36px;height:36px;border-radius:50%;background:var(--c);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:13px;font-weight:700;color:var(--bg)}
+.chat-hdr h3{font-family:var(--disp);font-size:14px;font-weight:700;color:#fff;margin-bottom:3px}
+.chat-hdr p{font-size:12px;color:var(--t1);line-height:1.7}
+.chat-msgs{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:10px;margin-bottom:10px;padding-right:4px}
+.msg{max-width:88%}
+.msg.user{align-self:flex-end}
+.msg.ai{align-self:flex-start}
+.mbub{padding:11px 14px;border-radius:12px;font-size:13px;line-height:1.7}
+.msg.user .mbub{background:var(--c);color:var(--bg);font-weight:500;border-bottom-right-radius:3px}
+.msg.ai .mbub{background:var(--s2);border:1px solid var(--bd0);color:var(--t0);border-bottom-left-radius:3px}
+.msg.ai.alert .mbub{background:var(--rd);border-color:rgba(255,51,85,.25);color:var(--r)}
+.msg.ai.good .mbub{background:var(--gd);border-color:rgba(16,232,120,.2);color:var(--g)}
+.mts{font-family:var(--mono);font-size:9px;color:var(--t2);margin-top:3px;padding:0 4px}
+.msg.user .mts{text-align:right}
+.qchips{display:flex;gap:6px;flex-wrap:wrap;flex-shrink:0;margin-bottom:10px}
+.qchip{padding:6px 12px;border:1px solid var(--bd0);border-radius:999px;font-size:12px;color:var(--t1);cursor:pointer;background:none;transition:all .13s}
+.qchip:hover{border-color:var(--c);color:var(--c)}
+.ci-row{display:flex;gap:8px;background:var(--s1);border:1px solid var(--bd0);border-radius:12px;padding:10px 13px;transition:border-color .18s;flex-shrink:0}
+.ci-row:focus-within{border-color:var(--c)}
+.ci{flex:1;background:none;border:none;outline:none;resize:none;font-family:var(--body);font-size:13px;color:var(--t0);line-height:1.5;max-height:120px;overflow-y:auto}
+.ci::placeholder{color:var(--t2)}
+.send-btn{align-self:flex-end;padding:7px 15px;background:var(--c);color:var(--bg);border:none;border-radius:7px;font-family:var(--mono);font-size:11px;font-weight:600;cursor:pointer;transition:opacity .14s;flex-shrink:0}
+.send-btn:hover{opacity:.85}
+
+/* ═══ DASHBOARD ═══ */
+.dash-wrap{max-width:960px;margin:0 auto}
+.verdict-bar{padding:13px 17px;border-radius:8px;border:1px solid var(--bd0);font-family:var(--mono);font-size:12px;color:var(--t2);display:flex;align-items:center;gap:10px;transition:all .5s;margin-bottom:20px}
+.verdict-bar.pass{background:var(--gd);border-color:rgba(16,232,120,.3);color:var(--g)}
+.verdict-bar.warn{background:var(--ad);border-color:rgba(255,184,0,.3);color:var(--a)}
+.verdict-bar.fail{background:var(--rd);border-color:rgba(255,51,85,.3);color:var(--r)}
+.arc-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+.arc-card{background:var(--s2);border:1px solid var(--bd0);border-radius:12px;padding:20px;text-align:center}
+.arc-card svg{display:block;margin:0 auto 8px}
+.arc-val{font-family:var(--disp);font-size:24px;font-weight:800;color:var(--t2);line-height:1;transition:color .5s}
+.arc-val.hi{color:var(--g)}.arc-val.mid{color:var(--a)}.arc-val.lo{color:var(--r)}
+.arc-lbl{font-family:var(--mono);font-size:10px;color:var(--t2);text-transform:uppercase;letter-spacing:1px;margin-top:4px}
+.stat-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:20px}
+.stat-card{background:var(--s2);border:1px solid var(--bd0);border-radius:12px;padding:14px;position:relative;overflow:hidden}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.stat-card.sc::before{background:var(--c)}.stat-card.sg::before{background:var(--g)}.stat-card.sr::before{background:var(--r)}.stat-card.sa::before{background:var(--a)}.stat-card.sp::before{background:var(--p)}
+.slbl{font-family:var(--mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--t2);margin-bottom:6px}
+.sval{font-family:var(--disp);font-size:22px;font-weight:800;line-height:1;color:var(--t2);transition:color .38s}
+.sval.lit{color:var(--t0)}
+.ssub{font-size:11px;color:var(--t2);margin-top:3px}
+.sec-h{font-family:var(--disp);font-size:16px;font-weight:700;color:#fff;margin-bottom:12px}
+.ftable{width:100%;border-collapse:collapse;margin-bottom:20px;font-size:12px}
+.ftable th{padding:10px 13px;text-align:left;background:var(--s2);font-family:var(--mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--t2);border-bottom:1px solid var(--bd0)}
+.ftable td{padding:10px 13px;border-bottom:1px solid var(--bd0);color:var(--t1);vertical-align:top}
+.ftable tr:hover td{background:var(--s2)}
+.sbadge{font-family:var(--mono);font-size:9px;padding:2px 7px;border-radius:3px}
+.sbadge.CRITICAL,.sbadge.HIGH{background:rgba(255,51,85,.15);color:var(--r)}
+.sbadge.MEDIUM{background:rgba(255,184,0,.12);color:var(--a)}
+.sbadge.LOW{background:rgba(0,196,244,.1);color:var(--c)}
+.sbadge.CLEAN,.sbadge.INFO{background:rgba(16,232,120,.1);color:var(--g)}
+
+/* ═══ RAG ═══ */
+.rag-intro{background:var(--s2);border:1px solid var(--bd0);border-radius:12px;padding:18px;margin-bottom:18px}
+.rag-intro h3{font-family:var(--disp);font-size:15px;font-weight:700;color:#fff;margin-bottom:5px}
+.rag-intro p{font-size:13px;color:var(--t1);line-height:1.75}
+.rag-hits{display:flex;flex-direction:column;gap:8px}
+.rag-hit{background:var(--s2);border:1px solid var(--bd0);border-radius:12px;padding:14px;display:flex;gap:12px;animation:fdin .3s ease}
+.rag-score{font-family:var(--mono);font-size:12px;width:52px;height:52px;border-radius:8px;background:var(--pd);border:1px solid var(--p);display:flex;align-items:center;justify-content:center;color:var(--p);font-weight:600;flex-shrink:0}
+.rag-hit h4{font-family:var(--mono);font-size:12px;color:var(--t0);margin-bottom:4px}
+.rag-hit p{font-size:12px;color:var(--t2);line-height:1.65}
+.rag-tag{display:inline-block;font-family:var(--mono);font-size:9px;padding:1px 7px;border-radius:3px;background:var(--rd);color:var(--r);margin-top:4px;margin-right:3px}
+
+/* ═══ FRAMEWORK ═══ */
+.fw-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+.fw-card{background:var(--s2);border:1px solid var(--bd0);border-radius:12px;padding:18px;position:relative}
+.fw-card.chosen{border-color:var(--c)}
+.fw-card.chosen::after{content:'SELECTED';position:absolute;top:-1px;right:14px;font-family:var(--mono);font-size:9px;letter-spacing:.5px;background:var(--c);color:var(--bg);padding:2px 8px;border-radius:0 0 3px 3px}
+.fw-name{font-family:var(--disp);font-size:15px;font-weight:800;margin-bottom:3px}
+.fw-card.chosen .fw-name{color:var(--c)}
+.fw-org{font-family:var(--mono);font-size:10px;color:var(--t2);margin-bottom:12px}
+.fw-pts{list-style:none;display:flex;flex-direction:column;gap:5px}
+.fw-pts li{font-size:12px;color:var(--t1);display:flex;gap:6px;line-height:1.5}
+.fw-pts li .mk{flex-shrink:0;margin-top:1px}
+.fw-pts li .mk.pro{color:var(--g)}.fw-pts li .mk.con{color:var(--r)}
+.codeblock{background:var(--bg);border:1px solid var(--bd0);border-radius:8px;padding:14px 16px;font-family:var(--mono);font-size:11px;line-height:1.9;overflow-x:auto;margin-top:12px}
+.ck{color:var(--c)}.cg{color:var(--g)}.cm2{color:var(--t2)}.ca{color:var(--a)}.cp{color:var(--p)}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- ═══ TOPBAR ═══ -->
+<header class="tb">
+  <div class="tb-logo" onclick="goHome()">
+    <div class="logo-hex"></div>
+    <div><div class="logo-name">Zenith</div><div class="logo-ver">AI Security · v3.0 · HACKFEST 2026</div></div>
+  </div>
+  <nav class="tb-nav" id="tb-nav" style="display:none">
+    <button class="tb-btn on" onclick="tbNav(&#39;pipeline&#39;,this)">Pipeline</button>
+    <button class="tb-btn" onclick="tbNav(&#39;chat&#39;,this)">AI Analyst</button>
+    <button class="tb-btn" onclick="tbNav(&#39;dashboard&#39;,this)">Dashboard</button>
+    <button class="tb-btn" onclick="tbNav(&#39;rag&#39;,this)">RAG Context</button>
+    <button class="tb-btn" onclick="tbNav(&#39;framework&#39;,this)">Framework</button>
+  </nav>
+  <div class="tb-right">
+    <div class="ws-pill"><div class="ws-dot" id="ws-dot"></div><span id="ws-lbl">Offline</span></div>
+    <div class="threat-chip" id="threat-chip" data-l="LOW">LOW</div>
+    <div class="tb-clk" id="tb-clk">23:04:26</div>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════════
+     IMPORT SCREEN
+═══════════════════════════════════ -->
+<div class="screen import-screen on" id="sc-import">
+  <div class="import-center">
+
+    <div class="import-hero">
+      <h1>Scan your code for<br><span>security vulnerabilities</span></h1>
+      <p>Connect a GitHub repository or upload a local folder. Zenith runs a full AI security pipeline — injection detection, SAST, CVE audit, and adversarial Red/Blue clash — in under 60 seconds.</p>
+    </div>
+
+    <div class="import-tabs">
+      <button class="itab on" onclick="switchTab(&#39;github&#39;,this)" id="itab-github">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg>
+        Clone GitHub repo
+      </button>
+      <button class="itab" onclick="switchTab(&#39;folder&#39;,this)" id="itab-folder">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M9.828 3h3.982a2 2 0 0 1 1.992 2.181l-.637 7A2 2 0 0 1 13.174 14H2.825a2 2 0 0 1-1.991-1.819l-.637-7a1.99 1.99 0 0 1 .342-1.31L.5 3a2 2 0 0 1 2-2h3.672a2 2 0 0 1 1.414.586l.828.828A2 2 0 0 0 9.828 3zm-8.322.12C1.72 3.042 1.95 3 2.19 3h5.396l-.707-.707A1 1 0 0 0 6.172 2H2.5a1 1 0 0 0-1 .981l.006.139z"></path></svg>
+        Upload folder
+      </button>
+    </div>
+
+    <!-- GitHub panel -->
+    <div class="ipanel on" id="ip-github">
+      <div class="gh-input-row">
+        <div class="gh-prefix">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg>
+          github.com /
+        </div>
+        <input class="gh-input" id="gh-url" placeholder="CYRUS-pinto/copy4  or paste full URL" onkeydown="if(event.key===&#39;Enter&#39;)cloneRepo()">
+        <button class="clone-btn" id="clone-btn" onclick="cloneRepo()">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2z"></path></svg>
+          Clone &amp; scan
+        </button>
+      </div>
+
+      <div id="gh-progress" style="display:none;margin-top:12px">
+        <div class="prog-track"><div class="prog-fill" id="gh-bar" style="width:0%"></div></div>
+        <div class="prog-steps" id="gh-steps"></div>
+      </div>
+      <div class="success-banner" id="gh-success">
+        <svg width="18" height="18" viewBox="0 0 16 16" fill="var(--g)" style="flex-shrink:0"><path d="M10.97 4.97a.235.235 0 0 0-.02.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.061L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05z"></path><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"></path></svg>
+        <div class="success-text">
+          <h4 id="gh-s-title">Repository cloned</h4>
+          <p id="gh-s-sub">Ready to scan</p>
+        </div>
+        <button class="scan-now-btn" onclick="launchScan()">Run security scan →</button>
+      </div>
+
+      <div style="margin-top:20px">
+        <div class="recent-label">Recent repositories</div>
+        <div class="repo-list">
+          <div class="repo-item" onclick="selectRepo(&#39;CYRUS-pinto/copy4&#39;)">
+            <div class="repo-ico"><svg width="14" height="14" viewBox="0 0 16 16" fill="var(--t2)"><path d="M2 2.5A2.5 2.5 0 0 1 4.5 0h8.75a.75.75 0 0 1 .75.75v12.5a.75.75 0 0 1-.75.75h-2.5a.75.75 0 1 1 0-1.5h1.75v-2h-8a1 1 0 0 0-.714 1.7.75.75 0 1 1-1.072 1.05A2.495 2.495 0 0 1 2 11.5v-9zm10.5-1V9h-8c-.356 0-.694.074-1 .208V2.5a1 1 0 0 1 1-1h8z"></path></svg></div>
+            <div><div class="repo-name">CYRUS-pinto/copy4</div><div class="repo-meta">2 min ago</div></div>
+            <div style="margin-left:auto"><span class="repo-lang">Python</span></div>
+          </div>
+          <div class="repo-item" onclick="selectRepo(&#39;hackfest-dev/HF26-06&#39;)">
+            <div class="repo-ico"><svg width="14" height="14" viewBox="0 0 16 16" fill="var(--t2)"><path d="M2 2.5A2.5 2.5 0 0 1 4.5 0h8.75a.75.75 0 0 1 .75.75v12.5a.75.75 0 0 1-.75.75h-2.5a.75.75 0 1 1 0-1.5h1.75v-2h-8a1 1 0 0 0-.714 1.7.75.75 0 1 1-1.072 1.05A2.495 2.495 0 0 1 2 11.5v-9zm10.5-1V9h-8c-.356 0-.694.074-1 .208V2.5a1 1 0 0 1 1-1h8z"></path></svg></div>
+            <div><div class="repo-name">hackfest-dev/HF26-06</div><div class="repo-meta">1 hr ago</div></div>
+            <div style="margin-left:auto"><span class="repo-lang">Python</span></div>
+          </div>
+          <div class="repo-item" onclick="selectRepo(&#39;org/express-api&#39;)">
+            <div class="repo-ico"><svg width="14" height="14" viewBox="0 0 16 16" fill="var(--t2)"><path d="M2 2.5A2.5 2.5 0 0 1 4.5 0h8.75a.75.75 0 0 1 .75.75v12.5a.75.75 0 0 1-.75.75h-2.5a.75.75 0 1 1 0-1.5h1.75v-2h-8a1 1 0 0 0-.714 1.7.75.75 0 1 1-1.072 1.05A2.495 2.495 0 0 1 2 11.5v-9zm10.5-1V9h-8c-.356 0-.694.074-1 .208V2.5a1 1 0 0 1 1-1h8z"></path></svg></div>
+            <div><div class="repo-name">org/express-api</div><div class="repo-meta">3 hrs ago</div></div>
+            <div style="margin-left:auto"><span class="repo-lang">JavaScript</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Folder panel -->
+    <div class="ipanel" id="ip-folder">
+      <div class="drop-zone" id="dropzone" ondragover="doDragOver(event)" ondragleave="doDragLeave()" ondrop="doDrop(event)" onclick="document.getElementById(&#39;ffile&#39;).click()">
+        <div class="drop-ico">
+          <svg width="22" height="22" viewBox="0 0 16 16" fill="var(--t1)"><path d="M9.828 3h3.982a2 2 0 0 1 1.992 2.181l-.637 7A2 2 0 0 1 13.174 14H2.825a2 2 0 0 1-1.991-1.819l-.637-7a1.99 1.99 0 0 1 .342-1.31L.5 3a2 2 0 0 1 2-2h3.672a2 2 0 0 1 1.414.586l.828.828A2 2 0 0 0 9.828 3zm-8.322.12C1.72 3.042 1.95 3 2.19 3h5.396l-.707-.707A1 1 0 0 0 6.172 2H2.5a1 1 0 0 0-1 .981l.006.139z"></path></svg>
+        </div>
+        <h3>Drop your project folder here</h3>
+        <p>All source files detected automatically — nothing leaves your machine</p>
+        <button class="browse-btn" onclick="event.stopPropagation();document.getElementById(&#39;ffile&#39;).click()">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"></path><path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z"></path></svg>
+          Browse files
+        </button>
+        <div class="file-types">
+          <span class="ftype">.py</span><span class="ftype">.js</span><span class="ftype">.ts</span>
+          <span class="ftype">.go</span><span class="ftype">.java</span><span class="ftype">.rs</span>
+          <span class="ftype">requirements.txt</span><span class="ftype">package.json</span>
+        </div>
+      </div>
+      <input type="file" id="ffile" multiple="" webkitdirectory="" onchange="onFilePick(event)">
+
+      <div class="file-preview" id="file-preview">
+        <div class="fp-header">
+          <span class="fp-title" id="fp-title">0 files selected</span>
+          <button class="fp-clear" onclick="clearFiles()">Clear</button>
+        </div>
+        <div class="file-list" id="file-list"></div>
+      </div>
+
+      <div id="folder-progress" style="display:none;margin-top:12px">
+        <div class="prog-track"><div class="prog-fill" id="folder-bar" style="width:0%"></div></div>
+        <div class="prog-steps" id="folder-steps"></div>
+      </div>
+      <div class="success-banner" id="folder-success">
+        <svg width="18" height="18" viewBox="0 0 16 16" fill="var(--g)" style="flex-shrink:0"><path d="M10.97 4.97a.235.235 0 0 0-.02.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.061L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05z"></path><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"></path></svg>
+        <div class="success-text">
+          <h4 id="folder-s-title">Folder ready</h4>
+          <p id="folder-s-sub">Ready to scan</p>
+        </div>
+        <button class="scan-now-btn" onclick="launchScan()">Run security scan →</button>
+      </div>
+
+      <div class="privacy-note">
+        <strong>Privacy:</strong> Files are read locally in the browser and sent only to your Zenith backend on localhost. Nothing leaves your machine to any third party.
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     MAIN APP SCREEN
+═══════════════════════════════════ -->
+<div class="screen app-screen" id="sc-app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-sec">
+      <div class="sb-lbl">Project</div>
+      <div class="project-card" id="proj-card">
+        <div class="pc-icon">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="var(--c)"><path d="M2 2.5A2.5 2.5 0 0 1 4.5 0h8.75a.75.75 0 0 1 .75.75v12.5a.75.75 0 0 1-.75.75h-2.5a.75.75 0 1 1 0-1.5h1.75v-2h-8a1 1 0 0 0-.714 1.7.75.75 0 1 1-1.072 1.05A2.495 2.495 0 0 1 2 11.5v-9zm10.5-1V9h-8c-.356 0-.694.074-1 .208V2.5a1 1 0 0 1 1-1h8z"></path></svg>
+        </div>
+        <div>
+          <div class="pc-name" id="proj-name">CYRUS-pinto/copy4</div>
+          <div class="pc-type" id="proj-type">Python · 6 files</div>
+        </div>
+      </div>
+      <button class="change-project-btn" onclick="goHome()">← Change project</button>
+    </div>
+
+    <div class="sb-sec">
+      <button class="run-btn" id="run-btn" onclick="startScan()">
+        <span id="run-ico">▶</span>
+        <span class="btn-spin" id="run-spin"></span>
+        <span id="run-lbl">Run security scan</span>
+      </button>
+    </div>
+
+    <div class="sb-sec">
+      <div class="sb-lbl">LLM — Navigator</div>
+      <div class="model-list" id="model-list">
+    <div class="mrow on" onclick="pickModel(&#39;llama-3.1-8b-instant&#39;,this)">
+      <div class="mdot" style="background:#10e878"></div>
+      <div><div class="mname">llama-3.1-8b</div><div class="msub">Tier 1 · shield+triage</div></div>
+      <div class="mcost">free</div>
+    </div>
+    <div class="mrow " onclick="pickModel(&#39;llama-3.1-70b-versatile&#39;,this)">
+      <div class="mdot" style="background:#00c4f4"></div>
+      <div><div class="mname">llama-3.1-70b</div><div class="msub">Tier 2 · SAST analysis</div></div>
+      <div class="mcost">$0.0001</div>
+    </div>
+    <div class="mrow " onclick="pickModel(&#39;llama-3.3-70b-specdec&#39;,this)">
+      <div class="mdot" style="background:#b47fff"></div>
+      <div><div class="mname">llama-3.3-70b</div><div class="msub">Tier 3 · exploit/patch</div></div>
+      <div class="mcost">$0.0003</div>
+    </div>
+    <div class="mrow " onclick="pickModel(&#39;mixtral-8x7b-32768&#39;,this)">
+      <div class="mdot" style="background:#ffb800"></div>
+      <div><div class="mname">mixtral-8x7b</div><div class="msub">Tier 4 · large context</div></div>
+      <div class="mcost">$0.0005</div>
+    </div></div>
+    </div>
+
+    <div class="sb-sec">
+      <div class="sb-lbl">Groq key pool</div>
+      <div class="key-pool" id="key-pool"><div class="krow"><div class="klbl">K1</div><div class="ktrack"><div class="kfill ok" style="width:100%"></div></div><div class="kpct ok">100%</div></div><div class="krow"><div class="klbl">K2</div><div class="ktrack"><div class="kfill ok" style="width:100%"></div></div><div class="kpct ok">100%</div></div><div class="krow"><div class="klbl">K3</div><div class="ktrack"><div class="kfill ok" style="width:100%"></div></div><div class="kpct ok">100%</div></div><div class="krow"><div class="klbl">K4</div><div class="ktrack"><div class="kfill ok" style="width:100%"></div></div><div class="kpct ok">100%</div></div><div class="krow"><div class="klbl">K5</div><div class="ktrack"><div class="kfill ok" style="width:100%"></div></div><div class="kpct ok">100%</div></div><div class="krow"><div class="klbl">K6</div><div class="ktrack"><div class="kfill ok" style="width:100%"></div></div><div class="kpct ok">100%</div></div><div class="krow"><div class="klbl">K7</div><div class="ktrack"><div class="kfill ok" style="width:100%"></div></div><div class="kpct ok">100%</div></div><div class="krow"><div class="klbl">K8</div><div class="ktrack"><div class="kfill ok" style="width:100%"></div></div><div class="kpct ok">100%</div></div></div>
+    </div>
+
+    <div class="sb-sec" style="flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0">
+      <div class="sb-lbl">DSPy modules</div>
+      <div class="dspy-list" id="dspy-list">
+    <div class="dspy-item ">
+      <span class="db sig">SIG</span>
+      <span class="dspy-name">InjectionClassifier</span>
+    </div>
+    <div class="dspy-item ">
+      <span class="db lm">LM</span>
+      <span class="dspy-name">FileTriage</span>
+    </div>
+    <div class="dspy-item ">
+      <span class="db cot">COT</span>
+      <span class="dspy-name">SemgrepAnalyzer</span>
+    </div>
+    <div class="dspy-item ">
+      <span class="db rag">RAG</span>
+      <span class="dspy-name">CVERetriever · OSV.dev</span>
+    </div>
+    <div class="dspy-item ">
+      <span class="db sig">SIG</span>
+      <span class="dspy-name">CredentialScanner</span>
+    </div>
+    <div class="dspy-item ">
+      <span class="db rag">RAG</span>
+      <span class="dspy-name">Pinecone · VulnKnowledge</span>
+    </div>
+    <div class="dspy-item ">
+      <span class="db cot">COT</span>
+      <span class="dspy-name">RedTeam · WriteExploit</span>
+    </div>
+    <div class="dspy-item ">
+      <span class="db cot">COT</span>
+      <span class="dspy-name">BlueTeam · PatchCode</span>
+    </div>
+    <div class="dspy-item ">
+      <span class="db sbx">SBX</span>
+      <span class="dspy-name">SandboxValidator</span>
+    </div>
+    <div class="dspy-item ">
+      <span class="db sig">SIG</span>
+      <span class="dspy-name">ScoreEngine</span>
+    </div></div>
+    </div>
+
+    <div class="sb-footer">
+      <button class="ghost-btn" onclick="window.open(&#39;zenith_visualization.html&#39;,&#39;_blank&#39;)">▶ Open live visualization</button>
+      <button class="ghost-btn" onclick="showView(&#39;dashboard&#39;)">☰ Dashboard</button>
+    </div>
+  </aside>
+
+  <!-- CONTENT -->
+  <div class="content">
+    <div class="vbar">
+      <button class="vt on" onclick="showView(&#39;pipeline&#39;,this)">Live pipeline</button>
+      <button class="vt" onclick="showView(&#39;chat&#39;,this)">AI analyst</button>
+      <button class="vt" onclick="showView(&#39;dashboard&#39;,this)">Scores &amp; findings</button>
+      <button class="vt" onclick="showView(&#39;rag&#39;,this)">RAG context</button>
+      <button class="vt" onclick="showView(&#39;framework&#39;,this)">Framework</button>
+    </div>
+
+    <!-- PIPELINE -->
+    <div class="vpane on" id="vp-pipeline">
+      <div class="pipe-canvas">
+        <div class="src-node" id="src-node">
+          <div class="src-ico">📁</div>
+          <div class="src-text"><h4>Input source</h4><p id="src-path">Waiting for scan...</p></div>
+          <div class="src-badge" id="src-badge">source_code</div>
+        </div>
+        <div class="conn" id="cn0"></div>
+        <div class="mc" data-s="idle" id="mc-M1">
+          <div class="mc-h"><div class="mc-n">1</div><div><div class="mc-title">Prompt injection shield</div><div class="mc-sub">ShieldGemma 2B · DSPy InjectionClassifier · P(violation) neural score</div></div><div class="mc-spin"></div><div class="mc-tag" id="mt-M1">Waiting</div></div>
+          <div class="mc-body"><div class="flist" id="fl-M1"><div class="empty">ShieldGemma 2B scores every input before any LLM receives it</div></div></div>
+        </div>
+        <div class="conn" id="cn1"></div>
+        <div class="mc" data-s="idle" id="mc-M2">
+          <div class="mc-h"><div class="mc-n">2</div><div><div class="mc-title">SAST · CVE · Credential audit</div><div class="mc-sub">Semgrep OWASP Top 10 · OSV.dev CVE · Hardcoded credential scan · Pinecone RAG</div></div><div class="mc-spin"></div><div class="mc-tag" id="mt-M2">Waiting</div></div>
+          <div class="mc-body"><div class="flist" id="fl-M2"><div class="empty">Semgrep OWASP · OSV.dev free CVE database · credential regex · Pinecone breach context</div></div></div>
+        </div>
+        <div class="conn" id="cn2"></div>
+        <div class="mc" data-s="idle" id="mc-M3">
+          <div class="mc-h"><div class="mc-n">3</div><div><div class="mc-title">Red / Blue adversarial clash</div><div class="mc-sub">DSPy WriteExploit → Sandbox → DSPy PatchCode → re-attack · max 3 rounds</div></div><div class="mc-spin"></div><div class="mc-tag" id="mt-M3">Waiting</div></div>
+          <div class="mc-body"><div class="clash-row" id="cl-row"></div><div id="diff-view"></div></div>
+        </div>
+        <div class="conn" id="cn3"></div>
+        <div class="mc" data-s="idle" id="mc-M4">
+          <div class="mc-h"><div class="mc-n">4</div><div><div class="mc-title">Score engine + verified report</div><div class="mc-sub">Confidence · Robustness · Integrity · Pinecone index update · JSON export</div></div><div class="mc-spin"></div><div class="mc-tag" id="mt-M4">Waiting</div></div>
+          <div class="mc-body"><div class="flist" id="fl-M4"><div class="empty">Deterministic score formula — no AI, no guesswork</div></div></div>
+        </div>
+        <div class="legend-row">
+          <div class="li"><div class="ld" style="background:var(--r)"></div>Critical / High</div>
+          <div class="li"><div class="ld" style="background:var(--a)"></div>Medium / Running</div>
+          <div class="li"><div class="ld" style="background:var(--g)"></div>Pass / Verified</div>
+          <div class="li"><div class="ld" style="background:var(--p)"></div>RAG / Sandbox</div>
+          <div class="li"><div class="ld" style="background:var(--t2)"></div>Skipped</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHAT -->
+    <div class="vpane" id="vp-chat" style="display:flex;flex-direction:column">
+      <div class="chat-shell">
+        <div class="chat-hdr">
+          <div class="ai-av">Z</div>
+          <div>
+            <h3>Zenith AI Security Analyst</h3>
+            <p>I explain every finding in plain English, surface real breach context from Pinecone, and walk through the Red/Blue clash. Run a scan or ask anything.</p>
+          </div>
+        </div>
+        <div class="chat-msgs" id="chat-msgs"><div class="msg ai"><div class="mbub" style="white-space:pre-wrap">Zenith Navigator online. Import a project to begin — paste a GitHub URL or drop a folder. I'll explain every finding in plain English as the pipeline runs.</div><div class="mts">23:04:13</div></div></div>
+        <div class="qchips">
+          <button class="qchip" onclick="askQ(&#39;What is SQL injection and why is it dangerous?&#39;)">SQL injection</button>
+          <button class="qchip" onclick="askQ(&#39;Explain the hardcoded credential finding&#39;)">Hardcoded creds</button>
+          <button class="qchip" onclick="askQ(&#39;Walk me through the Red/Blue clash rounds&#39;)">Red/Blue clash</button>
+          <button class="qchip" onclick="askQ(&#39;Why DSPy over LangGraph or CrewAI?&#39;)">Why DSPy?</button>
+          <button class="qchip" onclick="askQ(&#39;How does ShieldGemma 2B detect injections?&#39;)">ShieldGemma</button>
+          <button class="qchip" onclick="askQ(&#39;How does Pinecone RAG add breach context?&#39;)">Pinecone RAG</button>
+        </div>
+        <div class="ci-row">
+          <textarea class="ci" id="ci" rows="1" placeholder="Ask about a finding, the architecture, or security concepts..." onkeydown="if(event.key===&#39;Enter&#39;&amp;&amp;!event.shiftKey){event.preventDefault();sendChat()}"></textarea>
+          <button class="send-btn" onclick="sendChat()">Send</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div class="vpane" id="vp-dashboard">
+      <div class="dash-wrap">
+        <div class="verdict-bar" id="verdict-bar">Awaiting scan — import a project and click Run</div>
+        <div class="arc-row">
+          <div class="arc-card"><svg width="80" height="80" viewBox="0 0 80 80"><circle cx="40" cy="40" r="30" fill="none" stroke="var(--s4)" stroke-width="5"></circle><circle id="arc-c" cx="40" cy="40" r="30" fill="none" stroke="var(--g)" stroke-width="5" stroke-dasharray="0 188" stroke-dashoffset="47" stroke-linecap="round" style="transition:stroke-dasharray 1.2s ease,stroke .5s"></circle></svg><div class="arc-val" id="av-c">—</div><div class="arc-lbl">Confidence</div></div>
+          <div class="arc-card"><svg width="80" height="80" viewBox="0 0 80 80"><circle cx="40" cy="40" r="30" fill="none" stroke="var(--s4)" stroke-width="5"></circle><circle id="arc-r" cx="40" cy="40" r="30" fill="none" stroke="var(--g)" stroke-width="5" stroke-dasharray="0 188" stroke-dashoffset="47" stroke-linecap="round" style="transition:stroke-dasharray 1.2s ease,stroke .5s"></circle></svg><div class="arc-val" id="av-r">—</div><div class="arc-lbl">Robustness</div></div>
+          <div class="arc-card"><svg width="80" height="80" viewBox="0 0 80 80"><circle cx="40" cy="40" r="30" fill="none" stroke="var(--s4)" stroke-width="5"></circle><circle id="arc-i" cx="40" cy="40" r="30" fill="none" stroke="var(--g)" stroke-width="5" stroke-dasharray="0 188" stroke-dashoffset="47" stroke-linecap="round" style="transition:stroke-dasharray 1.2s ease,stroke .5s"></circle></svg><div class="arc-val" id="av-i">—</div><div class="arc-lbl">Integrity</div></div>
+        </div>
+        <div class="stat-grid">
+          <div class="stat-card sr"><div class="slbl">Findings</div><div class="sval" id="sv-f">0</div><div class="ssub">SAST total</div></div>
+          <div class="stat-card sa"><div class="slbl">CVEs</div><div class="sval" id="sv-cv">0</div><div class="ssub">OSV.dev</div></div>
+          <div class="stat-card sr"><div class="slbl">Cred leaks</div><div class="sval" id="sv-cr">0</div><div class="ssub">Hardcoded</div></div>
+          <div class="stat-card sp"><div class="slbl">RAG hits</div><div class="sval" id="sv-rg">0</div><div class="ssub">Pinecone ctx</div></div>
+          <div class="stat-card sc"><div class="slbl">Clash rounds</div><div class="sval" id="sv-rn">0</div><div class="ssub">Red/Blue</div></div>
+          <div class="stat-card sg"><div class="slbl">Scan time</div><div class="sval" id="sv-tm">—</div><div class="ssub">End-to-end</div></div>
+        </div>
+        <div class="sec-h">Findings breakdown</div>
+        <table class="ftable"><thead><tr><th>Severity</th><th>Rule / CVE</th><th>Module</th><th>Description</th></tr></thead><tbody id="ftbody"><tr><td colspan="4" class="empty">No findings yet</td></tr></tbody></table>
+      </div>
+    </div>
+
+    <!-- RAG -->
+    <div class="vpane" id="vp-rag">
+      <div style="max-width:820px;margin:0 auto">
+        <div class="rag-intro">
+          <h3>Pinecone RAG — Vulnerability knowledge base</h3>
+          <p>Every finding is matched against 50,000+ breach reports, CVE descriptions, and OWASP documentation stored in Pinecone. Semantic similarity surfaces exactly why this pattern caused real-world breaches — giving your engineers the "why", not just the "what".</p>
+        </div>
+        <div class="sec-h">Context retrieved for current scan</div>
+        <div class="rag-hits" id="rag-hits"><div class="empty">Run a scan — Pinecone retrieves the 3 most relevant breach records per finding</div></div>
+      </div>
+    </div>
+
+    <!-- FRAMEWORK -->
+    <div class="vpane" id="vp-framework">
+      <div style="max-width:920px;margin:0 auto">
+        <div class="sec-h">Framework selection — why DSPy</div>
+        <div class="fw-grid">
+          <div class="fw-card"><div class="fw-name">CrewAI</div><div class="fw-org">Role-based agent crews</div><ul class="fw-pts"><li><span class="mk pro">+</span>Easy role definitions</li><li><span class="mk pro">+</span>Good for collaborative tasks</li><li><span class="mk con">−</span>Wrong shape for pipelines</li><li><span class="mk con">−</span>Non-deterministic termination</li><li><span class="mk con">−</span>Hard to demo predictably</li></ul></div>
+          <div class="fw-card"><div class="fw-name">AutoGen</div><div class="fw-org">Microsoft · Conversational loops</div><ul class="fw-pts"><li><span class="mk pro">+</span>Microsoft-backed, mature</li><li><span class="mk pro">+</span>Good for dialogue tasks</li><li><span class="mk con">−</span>No sequential pipeline support</li><li><span class="mk con">−</span>Complex state management</li><li><span class="mk con">−</span>Non-reproducible for demos</li></ul></div>
+          <div class="fw-card chosen"><div class="fw-name">DSPy</div><div class="fw-org">Stanford NLP · Declarative LLM</div><ul class="fw-pts"><li><span class="mk pro">+</span>Define task — DSPy writes prompts</li><li><span class="mk pro">+</span>Swap models in one line</li><li><span class="mk pro">+</span>15 lines per module max</li><li><span class="mk pro">+</span>ChainOfThought built-in</li><li><span class="mk pro">+</span>Self-optimizes with MIPROv2</li></ul></div>
+        </div>
+        <div class="rag-intro">
+          <h3>Each module as a DSPy Signature</h3>
+          <div class="codeblock">
+<span class="cm2"># M1 — ShieldGemma 2B fallback classifier</span>
+<span class="ck">class</span> <span class="cp">InjectionClassifier</span>(dspy.Signature):
+    <span class="cg">"""Classify whether this text is a prompt injection attempt."""</span>
+    text: str = dspy.InputField()
+    is_injection: bool = dspy.OutputField()
+
+<span class="cm2"># M3 — Red Team exploit writer (15 lines total)</span>
+<span class="ck">class</span> <span class="cp">WriteExploit</span>(dspy.Signature):
+    <span class="cg">"""Write a minimal PoC exploit. Return EXPLOIT_IMPOSSIBLE if not exploitable."""</span>
+    code: str = dspy.InputField()
+    finding: str = dspy.InputField()
+    exploit: str = dspy.OutputField()
+
+<span class="cm2"># Navigator — swap Groq for OpenAI in ONE line</span>
+dspy.configure(lm=dspy.LM(<span class="cg">"groq/llama-3.3-70b-specdec"</span>))
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</div><!-- #app -->
+
+<script>
+/* ═══════════════════════════════════════════════════════════
+   ZENITH — Complete Application Logic
+   ═══════════════════════════════════════════════════════════ */
+
+const API = 'http://localhost:8000';
+const WS_URL = 'ws://localhost:8000/ws';
+
+// ── App state ────────────────────────────────────────────────
+const ST = {
+  project: null, running: false, ws: null,
+  findings: 0, cves: 0, creds: 0, rounds: 0, rag: 0,
+  threat: 'LOW', scanStart: 0, allFindings: [],
+  keyHealth: [100,100,100,100,100,100,100,100],
+};
+
+const MODELS = [
+  {id:'llama-3.1-8b-instant',  name:'llama-3.1-8b',  sub:'Tier 1 · shield+triage', cost:'free',    color:'#10e878'},
+  {id:'llama-3.1-70b-versatile',name:'llama-3.1-70b', sub:'Tier 2 · SAST analysis', cost:'$0.0001', color:'#00c4f4'},
+  {id:'llama-3.3-70b-specdec', name:'llama-3.3-70b',  sub:'Tier 3 · exploit/patch', cost:'$0.0003', color:'#b47fff'},
+  {id:'mixtral-8x7b-32768',    name:'mixtral-8x7b',   sub:'Tier 4 · large context', cost:'$0.0005', color:'#ffb800'},
+];
+
+const DSPY = [
+  {id:'Shield',  badge:'sig', label:'InjectionClassifier'},
+  {id:'Triage',  badge:'lm',  label:'FileTriage'},
+  {id:'Semgrep', badge:'cot', label:'SemgrepAnalyzer'},
+  {id:'CVE',     badge:'rag', label:'CVERetriever · OSV.dev'},
+  {id:'Cred',    badge:'sig', label:'CredentialScanner'},
+  {id:'RAG',     badge:'rag', label:'Pinecone · VulnKnowledge'},
+  {id:'Red',     badge:'cot', label:'RedTeam · WriteExploit'},
+  {id:'Blue',    badge:'cot', label:'BlueTeam · PatchCode'},
+  {id:'Sandbox', badge:'sbx', label:'SandboxValidator'},
+  {id:'Score',   badge:'sig', label:'ScoreEngine'},
+];
+
+const RAG_KB = [
+  {score:'0.97',title:'Equifax 2017 — SQL injection, 147M records',text:'Root cause: unparameterized SQL queries. user_id = "1 OR 1=1" returned the full users table. $700M settlement. This exact pattern is in your scan.',tags:['SQL injection','CWE-89','series A risk']},
+  {score:'0.92',title:'OWASP A03:2021 — Injection (CWE-89)',text:'SQL injection via string concatenation is #3 on OWASP Top 10. Parameterized queries (? placeholders) eliminate the class at zero performance cost.',tags:['OWASP','CWE-89','prevention']},
+  {score:'0.88',title:'Uber 2022 — hardcoded credentials in repo',text:'Hardcoded AWS credentials in private GitHub repo exposed 57M users via MFA bypass. Source code is never the right place for secrets.',tags:['hardcoded','AWS','series A risk']},
+  {score:'0.81',title:'CVE-2018-1000656 — Flask < 1.0.2 DoS',text:'Crafted JSON bodies cause 100% CPU in Flask < 1.0.2. Fix: upgrade to flask>=1.0.2 and validate Content-Type headers in middleware.',tags:['flask','PyPI','CVE']},
+];
+
+const AI_KB = {
+  'sql':       'SQL injection happens when user input is concatenated directly into a SQL query string:\n\n  query = "SELECT ... WHERE id = " + user_id\n\nAn attacker passes user_id = "1 OR 1=1" — returns every row. The Equifax breach (147M records, $700M settlement) used this exact pattern.\n\nFix: parameterized queries. The ? placeholder is never interpreted as SQL. Blue Team already wrote this patch — check the diff.',
+  'hardcoded': 'Hardcoded credentials in source code are existential risk for Series A startups. Code gets pushed to GitHub → repo gets compromised → credentials scraped by bots in minutes. The Uber 2022 breach followed this exactly.\n\nFix: environment variables for ALL secrets. Never put a password, API key, or token in source code.',
+  'red':       'The Red/Blue clash:\n1. Red Team AI (DSPy WriteExploit) writes a minimal PoC exploit\n2. Sandbox executes it in an isolated subprocess — confirmed it worked\n3. Blue Team AI (DSPy PatchCode) rewrites the vulnerable function securely\n4. Red Team re-attacks the patched version\n5. Round 2: EXPLOIT_IMPOSSIBLE — patch held\n\nThis is mathematical verification, not static analysis.',
+  'dspy':      'DSPy from Stanford is built for sequential reasoning pipelines. You define a typed Signature — input fields, output fields, a docstring describing the task — and DSPy writes the optimal prompt automatically. Swap Groq for OpenAI in one line. 15 lines per module instead of 100+ in LangGraph. CrewAI is for collaborative crews. AutoGen is for conversation loops. Neither fits a linear pipeline.',
+  'shield':    'ShieldGemma 2B is a 2-billion parameter model from Google, fine-tuned for safety policy violation classification. It reads semantic context — not keywords — so it catches novel injection patterns that regex misses. P(violation) is a probability 0–1. Runs locally, zero API cost, 50ms. Falls back to DSPy InjectionClassifier if the model is not loaded.',
+  'pinecone':  'Pinecone stores dense vector embeddings of 50,000+ breach reports, CVE descriptions, and OWASP documentation. When we detect SQL injection, we embed the finding and query Pinecone for nearest neighbours by cosine similarity. The RAG context tells your engineers WHY this pattern caused the Equifax breach — not just that it\'s dangerous. Evidence motivates fixes faster than abstract warnings.',
+  'default':   "I'm monitoring the pipeline in real time. Ask me about any finding — SQL injection, hardcoded credentials, the Red/Blue clash, DSPy architecture, or Pinecone RAG. Or run a scan and I'll walk through every issue as it appears.",
+};
+
+// ── Init ─────────────────────────────────────────────────────
+function init() {
+  renderModels(); renderKeys(); renderDspy();
+  setInterval(() => { document.getElementById('tb-clk').textContent = new Date().toLocaleTimeString(); }, 1000);
+  connectWS();
+  addChat('ai', "Zenith Navigator online. Import a project to begin — paste a GitHub URL or drop a folder. I'll explain every finding in plain English as the pipeline runs.");
+}
+
+// ── Screen navigation ────────────────────────────────────────
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('on'));
+  document.getElementById('sc-' + id).classList.add('on');
+  document.getElementById('tb-nav').style.display = id === 'app' ? 'flex' : 'none';
+}
+
+function goHome() {
+  showScreen('import');
+  resetPipeline();
+}
+
+// ── Import tab switch ────────────────────────────────────────
+function switchTab(id, el) {
+  document.querySelectorAll('.itab').forEach(t => t.classList.remove('on'));
+  document.querySelectorAll('.ipanel').forEach(p => p.classList.remove('on'));
+  el.classList.add('on');
+  document.getElementById('ip-' + id).classList.add('on');
+}
+
+// ── Repo selection ────────────────────────────────────────────
+function selectRepo(name) {
+  document.getElementById('gh-url').value = name;
+  document.querySelectorAll('.repo-item').forEach(r => r.classList.remove('selected'));
+  event.currentTarget.classList.add('selected');
+}
+
+// ── Clone flow ────────────────────────────────────────────────
+function cloneRepo() {
+  const raw = document.getElementById('gh-url').value.trim();
+  if (!raw) return;
+  const repo = raw.replace(/https?:\/\/github\.com\//,'');
+  document.getElementById('clone-btn').disabled = true;
+
+  const steps = [
+    {label: `Resolving ${repo}`, ms: 500},
+    {label: 'Cloning repository (depth=1)', ms: 900},
+    {label: 'Detecting languages and frameworks', ms: 500},
+    {label: 'Indexing source files', ms: 400},
+    {label: 'Ready for security scan', ms: 300},
+  ];
+
+  runProgress('gh', steps, () => {
+    const parts = repo.split('/');
+    const files = 4 + Math.floor(Math.random() * 8);
+    document.getElementById('gh-s-title').textContent = `${repo} cloned`;
+    document.getElementById('gh-s-sub').textContent = `Python · ${files} source files found`;
+    document.getElementById('gh-success').classList.add('on');
+    document.getElementById('clone-btn').disabled = false;
+    ST.project = {name: repo, type: 'GitHub', files, lang: 'Python'};
+  });
+}
+
+// ── Folder / file pick ────────────────────────────────────────
+function doDragOver(e) { e.preventDefault(); document.getElementById('dropzone').classList.add('over'); }
+function doDragLeave() { document.getElementById('dropzone').classList.remove('over'); }
+function doDrop(e) {
+  e.preventDefault();
+  document.getElementById('dropzone').classList.remove('over');
+  const count = e.dataTransfer.items.length || 5;
+  showFilesPreview(Array.from({length:count}).map((_,i)=>({name:`file_${i+1}.py`,size:Math.round(Math.random()*8000+500)})), 'dropped-folder');
+}
+function onFilePick(e) {
+  const files = Array.from(e.target.files);
+  if (!files.length) return;
+  showFilesPreview(files, files[0].webkitRelativePath ? files[0].webkitRelativePath.split('/')[0] : 'selected-files');
+}
+function showFilesPreview(files, folderName) {
+  const src = files.filter(f => /\.(py|js|ts|go|java|rs|rb|php|c|cpp|cs|txt|json|toml|yaml|yml)$/i.test(f.name||''));
+  document.getElementById('fp-title').textContent = `${files.length} files · ${src.length} source files`;
+  const list = document.getElementById('file-list');
+  list.innerHTML = '';
+  files.slice(0,8).forEach(f => {
+    const ext = (f.name||'').split('.').pop();
+    const sz = f.size ? (f.size>1024?Math.round(f.size/1024)+'KB':f.size+'B') : '—';
+    list.insertAdjacentHTML('beforeend',`<div class="file-entry"><span style="color:var(--t2);font-size:10px">.${ext}</span> ${esc(f.name||f)} <span class="file-sz">${sz}</span></div>`);
+  });
+  if (files.length>8) list.insertAdjacentHTML('beforeend',`<div class="file-entry" style="color:var(--t2)">+ ${files.length-8} more files</div>`);
+  document.getElementById('file-preview').classList.add('on');
+  ST.project = {name: folderName, type:'Folder', files: src.length||files.length, lang:'Python'};
+  setTimeout(() => {
+    const steps = [
+      {label:`Reading ${src.length||files.length} source files`, ms:500},
+      {label:'Detecting project type', ms:400},
+      {label:'Parsing dependency manifests', ms:500},
+      {label:'Ready for security scan', ms:300},
+    ];
+    runProgress('folder', steps, () => {
+      document.getElementById('folder-s-title').textContent = `${folderName} ready`;
+      document.getElementById('folder-s-sub').textContent = `${src.length||files.length} source files · dependencies detected`;
+      document.getElementById('folder-success').classList.add('on');
+    });
+  }, 300);
+}
+function clearFiles() {
+  document.getElementById('file-preview').classList.remove('on');
+  document.getElementById('folder-progress').style.display = 'none';
+  document.getElementById('folder-success').classList.remove('on');
+  document.getElementById('ffile').value = '';
+  ST.project = null;
+}
+
+// ── Progress runner ───────────────────────────────────────────
+function runProgress(prefix, steps, done) {
+  const wrap = document.getElementById(`${prefix}-progress`);
+  const bar  = document.getElementById(`${prefix}-bar`);
+  const stepsEl = document.getElementById(`${prefix}-steps`);
+  wrap.style.display = 'block';
+  stepsEl.innerHTML = steps.map(s=>`<div class="prog-step"><div class="step-dot"></div>${esc(s.label)}</div>`).join('');
+  const els = stepsEl.querySelectorAll('.prog-step');
+  let i = 0;
+  function tick() {
+    if (i>0) { els[i-1].classList.remove('active'); els[i-1].classList.add('done'); }
+    if (i>=steps.length) { bar.style.width='100%'; done(); return; }
+    els[i].classList.add('active');
+    bar.style.width = Math.round(((i+1)/steps.length)*100)+'%';
+    setTimeout(tick, steps[i++].ms);
+  }
+  tick();
+}
+
+// ── Launch scan → switch to app screen ───────────────────────
+function launchScan() {
+  if (!ST.project) ST.project = {name:'CYRUS-pinto/copy4',type:'GitHub',files:6,lang:'Python'};
+  document.getElementById('proj-name').textContent = ST.project.name;
+  document.getElementById('proj-type').textContent = `${ST.project.lang} · ${ST.project.files} files`;
+  showScreen('app');
+  setTimeout(startScan, 400);
+}
+
+// ── View switching ────────────────────────────────────────────
+let curView = 'pipeline';
+function showView(id, el) {
+  document.querySelectorAll('.vpane').forEach(v => v.classList.remove('on'));
+  document.querySelectorAll('.vt').forEach(b => b.classList.remove('on'));
+  document.getElementById('vp-'+id).classList.add('on');
+  if (el) el.classList.add('on');
+  else document.querySelectorAll('.vt').forEach(b => { if (b.textContent.toLowerCase().includes(id.split('')[0])) b.classList.add('on'); });
+  curView = id;
+}
+function tbNav(id, el) {
+  document.querySelectorAll('.tb-btn').forEach(b => b.classList.remove('on'));
+  el.classList.add('on');
+  const map = {pipeline:'pipeline',chat:'chat',dashboard:'dashboard',rag:'rag',framework:'framework'};
+  showView(map[id]||id);
+}
+
+// ── Render sidebar ────────────────────────────────────────────
+let selModel = 'llama-3.1-8b-instant';
+function renderModels() {
+  document.getElementById('model-list').innerHTML = MODELS.map(m=>`
+    <div class="mrow ${m.id===selModel?'on':''}" onclick="pickModel('${m.id}',this)">
+      <div class="mdot" style="background:${m.color}"></div>
+      <div><div class="mname">${m.name}</div><div class="msub">${m.sub}</div></div>
+      <div class="mcost">${m.cost}</div>
+    </div>`).join('');
+}
+function pickModel(id, el) {
+  selModel = id;
+  document.querySelectorAll('.mrow').forEach(r=>r.classList.remove('on'));
+  el.classList.add('on');
+}
+function renderKeys() {
+  document.getElementById('key-pool').innerHTML = ST.keyHealth.map((p,i)=>{
+    const c = p>60?'ok':p>20?'w':'x';
+    return `<div class="krow"><div class="klbl">K${i+1}</div><div class="ktrack"><div class="kfill ${c}" style="width:${p}%"></div></div><div class="kpct ${c}">${p}%</div></div>`;
+  }).join('');
+}
+function renderDspy(active=[]) {
+  document.getElementById('dspy-list').innerHTML = DSPY.map(d=>`
+    <div class="dspy-item ${active.includes(d.id)?'lit':''}">
+      <span class="db ${d.badge}">${d.badge.toUpperCase()}</span>
+      <span class="dspy-name">${d.label}</span>
+    </div>`).join('');
+}
+function litDspy(ids) { renderDspy(ids); }
+
+// ── Pipeline helpers ──────────────────────────────────────────
+function mcSet(id, s, label) {
+  const mc = document.getElementById('mc-'+id);
+  const mt = document.getElementById('mt-'+id);
+  if (mc) mc.dataset.s = s;
+  if (mt) mt.textContent = label||s;
+}
+function connOn(n) { const c=document.getElementById('cn'+n); if(c)c.classList.add('on'); }
+function addFnd(mid, sev, msg, rule, snip) {
+  const el = document.getElementById('fl-'+mid); if (!el) return;
+  const emp = el.querySelector('.empty'); if (emp) emp.remove();
+  const d = document.createElement('div'); d.className='fnd '+sev;
+  d.innerHTML=`<div class="fsev">${sev}</div><div><div class="fmsg">${esc(msg)}</div>${rule?`<div class="frule">${esc(rule)}</div>`:''}${snip?`<code class="fsnip">${esc(snip)}</code>`:''}</div>`;
+  el.appendChild(d);
+  ST.allFindings.push({sev,msg,rule,mid});
+  refreshFTable();
+}
+function addCC(type,label) {
+  const el=document.getElementById('cl-row'); if(!el) return;
+  const d=document.createElement('div'); d.className='cc '+type; d.textContent=label; el.appendChild(d);
+}
+function showDiff() {
+  const el=document.getElementById('diff-view'); if(!el) return;
+  el.innerHTML=`<div class="diff-block"><span class="dl rm">-    query = "SELECT * FROM users WHERE id = " + user_id</span><span class="dl add">+    return conn.execute(</span><span class="dl add">+        "SELECT id, name FROM users WHERE id = ?",</span><span class="dl add">+        (user_id.strip(),)</span><span class="dl add">+    ).fetchall()</span><span class="dl ctx">     # Parameterized — EXPLOIT_IMPOSSIBLE</span></div>`;
+}
+function setScores(c,r,i) {
+  const circ=2*Math.PI*30;
+  [['c',c],['r',r],['i',i]].forEach(([k,v])=>{
+    const arc=document.getElementById('arc-'+k),txt=document.getElementById('av-'+k);
+    if(!arc||!txt) return;
+    arc.style.strokeDasharray=(circ*(v/100)).toFixed(1)+' '+circ;
+    arc.style.stroke=v>=75?'var(--g)':v>=50?'var(--a)':'var(--r)';
+    txt.textContent=Math.round(v)+'%';
+    txt.className='arc-val '+(v>=75?'hi':v>=50?'mid':'lo');
+  });
+}
+function setVerdict(txt,cls) {
+  const el=document.getElementById('verdict-bar'); if(!el) return;
+  el.className='verdict-bar '+cls; el.textContent=txt;
+}
+function updStats() {
+  const map=[['f',ST.findings,'sr'],['cv',ST.cves,'sa'],['cr',ST.creds,'sr'],['rg',ST.rag,'sp'],['rn',ST.rounds,'sc']];
+  map.forEach(([k,v,c])=>{
+    const el=document.getElementById('sv-'+k); if(!el) return;
+    el.textContent=v; if(v>0)el.classList.add('lit'); else el.classList.remove('lit');
+  });
+  if(ST.scanStart){ const el=document.getElementById('sv-tm'); if(el)el.textContent=((Date.now()-ST.scanStart)/1000).toFixed(1)+'s'; }
+  const tc=document.getElementById('threat-chip');
+  if(tc){tc.textContent=ST.threat;tc.dataset.l=ST.threat;}
+}
+function refreshFTable() {
+  const tb=document.getElementById('ftbody'); if(!tb) return;
+  if(!ST.allFindings.length){tb.innerHTML='<tr><td colspan="4" class="empty">No findings yet</td></tr>';return;}
+  tb.innerHTML=ST.allFindings.map(f=>`<tr><td><span class="sbadge ${f.sev}">${f.sev}</span></td><td style="font-family:var(--mono);font-size:11px;color:var(--t0)">${esc(f.rule||'—')}</td><td style="font-family:var(--mono);font-size:11px;color:var(--t2)">${f.mid}</td><td>${esc(f.msg)}</td></tr>`).join('');
+}
+function renderRAG(data) {
+  const el=document.getElementById('rag-hits'); if(!el) return;
+  el.innerHTML=''; (data||RAG_KB).forEach(h=>{
+    const d=document.createElement('div'); d.className='rag-hit';
+    d.innerHTML=`<div class="rag-score">${h.score}</div><div><h4>${esc(h.title)}</h4><p>${esc(h.text)}</p>${(h.tags||[]).map(t=>`<span class="rag-tag">${esc(t)}</span>`).join('')}</div>`;
+    el.appendChild(d); ST.rag++;
+  }); updStats();
+}
+
+// ── Reset ─────────────────────────────────────────────────────
+function resetPipeline() {
+  ['M1','M2','M3','M4'].forEach(id=>{
+    mcSet(id,'idle','Waiting');
+    const fl=document.getElementById('fl-'+id); if(fl)fl.innerHTML='<div class="empty">—</div>';
+  });
+  const cl=document.getElementById('cl-row'); if(cl)cl.innerHTML='';
+  const dv=document.getElementById('diff-view'); if(dv)dv.innerHTML='';
+  document.querySelectorAll('.conn').forEach(c=>c.classList.remove('on'));
+  const sn=document.getElementById('src-node'); if(sn)sn.classList.remove('live');
+  setScores(0,0,0); setVerdict('Awaiting scan — import a project and click Run','');
+  const rh=document.getElementById('rag-hits'); if(rh)rh.innerHTML='<div class="empty">Run a scan</div>';
+  ST.findings=0;ST.cves=0;ST.creds=0;ST.rounds=0;ST.rag=0;ST.threat='LOW';ST.allFindings=[];
+  refreshFTable(); updStats(); litDspy([]);
+}
+
+// ── Demo sequence ─────────────────────────────────────────────
+const delay = ms => new Promise(r=>setTimeout(r,ms));
+const isInj = () => ((ST.project&&ST.project.name)||'').toLowerCase().includes('ignore') ||
+                    (document.getElementById('gh-url')?.value||'').toLowerCase().includes('ignore');
+
+async function runDemo() {
+  const projName = ST.project?.name || 'CYRUS-pinto/copy4';
+  const sn=document.getElementById('src-node');
+  const sp=document.getElementById('src-path');
+  if(sn)sn.classList.add('live');
+  if(sp)sp.textContent=projName;
+  addChat('ai', `Starting pipeline scan on ${projName}. Module 1 loading ShieldGemma 2B for injection detection...`);
+  await delay(400);
+
+  // M1
+  connOn(0); mcSet('M1','run','Scanning'); litDspy(['Shield']);
+  await delay(1000);
+
+  if (isInj()) {
+    addFnd('M1','CRITICAL','Prompt injection detected — P(violation)=0.97','ShieldGemma 2B');
+    mcSet('M1','fail','CRITICAL'); ST.threat='CRITICAL'; updStats(); litDspy([]);
+    addChat('ai','CRITICAL: Input blocked. ShieldGemma 2B scored P(violation)=0.97 — prompt injection detected. Pipeline halted. No LLM received this input.','alert');
+    finishRun(); return;
+  }
+
+  addFnd('M1','CLEAN','No injection detected — P(violation)=0.03','ShieldGemma 2B');
+  mcSet('M1','pass','Clean'); litDspy(['Triage']); await delay(500);
+
+  // M2
+  connOn(1); mcSet('M2','run','Scanning'); litDspy(['Semgrep','CVE','Cred','RAG']);
+  await delay(1600);
+  addFnd('M2','HIGH','SQL injection via string concatenation','python.sqli.string-concat · line 6','query = "SELECT * FROM users WHERE id = " + user_id');
+  addFnd('M2','HIGH','Code injection via eval()','python.security.eval · line 18','return eval(data)');
+  addFnd('M2','HIGH','CVE-2018-1000656 — flask==1.0.0','OSV.dev · PyPI · flask<1.0.2');
+  addFnd('M2','HIGH','Hardcoded password found','CredentialScanner · line 11','if password == "admin123":');
+  addFnd('M2','HIGH','Hardcoded API key found','CredentialScanner · line 22','flask_key = "hardcoded-secret-key-123"');
+  ST.findings=4; ST.cves=1; ST.creds=2; ST.threat='HIGH';
+  mcSet('M2','fail','5 findings'); litDspy([]); updStats();
+  renderRAG(RAG_KB);
+  addChat('ai','Module 2 found 5 issues: 2 SAST findings, 1 CVE (flask==1.0.0), 2 hardcoded credentials. Pinecone retrieved 4 breach context records. Routing to Red/Blue clash.');
+  await delay(600);
+
+  // Key rotation demo
+  ST.keyHealth = [100,100,8,100,100,100,100,100]; renderKeys();
+  addChat('ai','Navigator: Key 3 rate-limited (8%). Rotating to Key 4 — pipeline continues without interruption.');
+  await delay(400);
+
+  // M3
+  connOn(2); mcSet('M3','run','Round 1'); litDspy(['Red']); addCC('red','R1 Attack');
+  await delay(1100);
+  addCC('sbx','Sandbox: hit'); await delay(600);
+  mcSet('M3','run','Round 1 · Blue'); litDspy(['Blue']); addCC('blue','R1 Patch');
+  await delay(1000);
+  mcSet('M3','run','Round 2'); litDspy(['Red','Sandbox']); addCC('red','R2 Attack');
+  ST.rounds=2; updStats(); await delay(900);
+  addCC('sbx','Sandbox: blocked'); addCC('win','✓ Verified');
+  mcSet('M3','pass','PATCHED'); showDiff(); litDspy([]);
+  addChat('ai','Clash complete — PATCHED after 2 rounds. Red Team confirmed EXPLOIT_IMPOSSIBLE on patched version. Patch is mathematically verified.','good');
+  await delay(600);
+
+  // Key recovery
+  ST.keyHealth=[100,100,88,100,100,100,100,100]; renderKeys();
+
+  // M4
+  connOn(3); mcSet('M4','run','Scoring'); litDspy(['Score']);
+  await delay(900);
+  setScores(94,87,100);
+  mcSet('M4','pass','Complete'); litDspy([]);
+  setVerdict('✓ Patch VERIFIED — Confidence 94% · Robustness 87% · Integrity 100%','pass');
+  addFnd('M4','INFO','Scores: C=94% R=87% I=100%','ScoreEngine · deterministic formula');
+  addChat('ai','Pipeline complete. Dashboard tab shows full scores. Confidence 94 · Robustness 87 · Integrity 100. Patch status: VERIFIED.','good');
+  updStats(); finishRun();
+}
+
+function finishRun() {
+  ST.running=false;
+  document.getElementById('run-btn').disabled=false;
+  document.getElementById('run-ico').style.display='inline';
+  document.getElementById('run-spin').style.display='none';
+  document.getElementById('run-lbl').textContent='Run security scan';
+}
+
+// ── Start scan ────────────────────────────────────────────────
+async function startScan() {
+  if (ST.running) return;
+  ST.running=true; ST.scanStart=Date.now();
+  resetPipeline();
+  document.getElementById('run-btn').disabled=true;
+  document.getElementById('run-ico').style.display='none';
+  document.getElementById('run-spin').style.display='block';
+  document.getElementById('run-lbl').textContent='Scanning...';
+  try {
+    if (ST.ws?.readyState===1) {
+      const proj=ST.project?.name||'';
+      await fetch(API+'/api/scan',{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({repo_url:proj.startsWith('http')?proj:'', prompt:!proj.startsWith('http')?proj:''})});
+    } else { await runDemo(); }
+  } catch { await runDemo(); }
+}
+
+// ── WebSocket ─────────────────────────────────────────────────
+function connectWS() {
+  try {
+    ST.ws=new WebSocket(WS_URL);
+    ST.ws.onopen=()=>{
+      document.getElementById('ws-dot').classList.add('on');
+      document.getElementById('ws-lbl').textContent='Live';
+    };
+    ST.ws.onclose=()=>{
+      document.getElementById('ws-dot').classList.remove('on');
+      document.getElementById('ws-lbl').textContent='Offline';
+      setTimeout(connectWS,4000);
+    };
+    ST.ws.onerror=()=>ST.ws.close();
+    ST.ws.onmessage=e=>{
+      try { handleWS(JSON.parse(e.data)); } catch {}
+    };
+  } catch { setTimeout(connectWS,5000); }
+}
+function handleWS(ev) {
+  const {module:mod,status,label,data}=ev;
+  if(mod==='PIPELINE'&&status==='complete'&&data){
+    if(data.confidence)setScores(data.confidence,data.robustness,data.integrity);
+    if(data.threat_level){ST.threat=data.threat_level;updStats();}
+    if(data.scan_time_ms){const el=document.getElementById('sv-tm');if(el)el.textContent=(data.scan_time_ms/1000).toFixed(1)+'s';}
+    finishRun();
+  }
+}
+
+// ── Chat ──────────────────────────────────────────────────────
+function addChat(role, text, cls='') {
+  const el=document.getElementById('chat-msgs'); if(!el) return;
+  const ts=new Date().toLocaleTimeString('en-GB',{hour12:false});
+  const d=document.createElement('div'); d.className=`msg ${role}${cls?' '+cls:''}`;
+  d.innerHTML=`<div class="mbub" style="white-space:pre-wrap">${esc(text)}</div><div class="mts">${ts}</div>`;
+  el.appendChild(d); el.scrollTop=el.scrollHeight;
+}
+function askQ(q) {
+  addChat('user',q);
+  setTimeout(()=>{
+    const ql=q.toLowerCase();
+    const key=Object.keys(AI_KB).find(k=>ql.includes(k))||'default';
+    addChat('ai',AI_KB[key]);
+  },450);
+}
+function sendChat() {
+  const ci=document.getElementById('ci'); if(!ci||!ci.value.trim()) return;
+  const q=ci.value.trim(); ci.value=''; askQ(q);
+}
+
+// ── Utils ─────────────────────────────────────────────────────
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// ── Boot ──────────────────────────────────────────────────────
+init();
+</script>
+
+
+</body></html>

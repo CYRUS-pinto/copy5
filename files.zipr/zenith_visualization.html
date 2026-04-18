@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zenith — Live Security Visualization</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&family=Syne:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+/* =====================================================================
+   ZENITH VISUALIZATION SITE
+   The live "GitHub URL → colour-coded vulnerability map" moment
+   Aesthetic: Dark command centre — dramatic, cinematic, judge-memorable
+   ===================================================================== */
+*,::before,::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#060810;--s1:#0b0e1a;--s2:#101525;--s3:#161d2e;--s4:#1c2540;
+  --bd:rgba(255,255,255,.06);--bd2:rgba(255,255,255,.12);
+  --c0:#00d4ff;--c0d:rgba(0,212,255,.1);--c0g:rgba(0,212,255,.2);
+  --g0:#00ff7f;--g0d:rgba(0,255,127,.1);
+  --r0:#ff3366;--r0d:rgba(255,51,102,.1);
+  --a0:#ffcc00;--a0d:rgba(255,204,0,.1);
+  --p0:#c084fc;--p0d:rgba(192,132,252,.1);
+  --t0:#e8eeff;--t1:#8898c0;--t2:#3a4a6a;--t3:#1a2240;
+  --mono:'JetBrains Mono',monospace;
+  --disp:'Syne',sans-serif;
+}
+html,body{height:100%;background:var(--bg);color:var(--t0);font-family:var(--mono);font-size:13px;line-height:1.5;overflow:hidden}
+
+/* ── cinematic background ── */
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(ellipse 60% 60% at 50% -10%,rgba(0,212,255,.07) 0%,transparent 55%),
+    radial-gradient(ellipse 40% 40% at 5% 60%,rgba(0,255,127,.04) 0%,transparent 50%),
+    radial-gradient(ellipse 35% 50% at 95% 40%,rgba(255,51,102,.04) 0%,transparent 50%),
+    repeating-linear-gradient(0deg,transparent,transparent 59px,rgba(255,255,255,.012) 60px),
+    repeating-linear-gradient(90deg,transparent,transparent 59px,rgba(255,255,255,.012) 60px);
+}
+
+/* ── scanline overlay ── */
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.08) 4px)}
+
+.wrap{position:relative;z-index:1;height:100vh;display:flex;flex-direction:column}
+
+/* ── TOP BAR ── */
+.top{
+  display:flex;align-items:center;justify-content:space-between;
+  height:56px;flex-shrink:0;padding:0 28px;
+  background:rgba(6,8,16,.9);border-bottom:1px solid var(--bd);
+  backdrop-filter:blur(16px);
+}
+.top-brand{display:flex;align-items:center;gap:10px}
+.thex{
+  width:30px;height:30px;
+  background:var(--c0);
+  clip-path:polygon(50% 0%,93% 25%,93% 75%,50% 100%,7% 75%,7% 25%);
+  display:flex;align-items:center;justify-content:center;
+  animation:hexp 3.5s ease-in-out infinite;
+}
+@keyframes hexp{0%,100%{opacity:1}50%{opacity:.75}}
+.thex::after{content:'';width:12px;height:12px;background:var(--bg);clip-path:polygon(50% 0%,93% 25%,93% 75%,50% 100%,7% 75%,7% 25%)}
+.tname{font-family:var(--disp);font-size:19px;font-weight:900;color:#fff;letter-spacing:-1px}
+.tsub{font-size:9px;color:var(--t2);letter-spacing:2px;text-transform:uppercase;margin-left:14px}
+.top-r{display:flex;align-items:center;gap:12px}
+.ws-p{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--t2);padding:4px 12px;border:1px solid var(--bd);border-radius:999px}
+.ws-d{width:6px;height:6px;border-radius:50%;background:var(--t3);transition:background .3s}
+.ws-d.on{background:var(--g0);box-shadow:0 0 5px var(--g0);animation:blnk 2s infinite}
+@keyframes blnk{0%,100%{opacity:1}50%{opacity:.3}}
+.threat-t{font-size:10px;letter-spacing:.5px;text-transform:uppercase;padding:4px 10px;border:1px solid var(--bd);border-radius:3px;color:var(--t2);transition:all .4s}
+.threat-t.HIGH,.threat-t.CRITICAL{border-color:var(--r0);color:var(--r0);background:var(--r0d)}
+.threat-t.MEDIUM{border-color:var(--a0);color:var(--a0);background:var(--a0d)}
+.threat-t.LOW{border-color:var(--g0);color:var(--g0);background:var(--g0d)}
+.clk{font-size:10px;color:var(--t2)}
+
+/* ── URL BAR ── */
+.urlbar{
+  display:flex;align-items:center;gap:10px;
+  padding:12px 28px;background:var(--s1);border-bottom:1px solid var(--bd);flex-shrink:0;
+}
+.url-prefix{font-size:11px;color:var(--t2);white-space:nowrap}
+.url-input{
+  flex:1;background:var(--s2);border:1px solid var(--bd);border-radius:7px;
+  padding:9px 14px;font-family:var(--mono);font-size:12px;color:var(--t0);
+  outline:none;transition:border-color .2s;
+}
+.url-input:focus{border-color:var(--c0)}
+.url-input::placeholder{color:var(--t2)}
+.scan-go{
+  padding:9px 20px;background:var(--c0);color:var(--bg);
+  border:none;border-radius:7px;font-family:var(--mono);font-size:12px;font-weight:600;
+  cursor:pointer;white-space:nowrap;transition:opacity .2s;display:flex;align-items:center;gap:8px;
+}
+.scan-go:hover{opacity:.85}
+.scan-go:disabled{opacity:.35;cursor:not-allowed}
+.scan-go .s{width:13px;height:13px;border:2px solid rgba(6,8,16,.25);border-top-color:var(--bg);border-radius:50%;animation:spin .6s linear infinite;display:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+.scan-go.running .s{display:block}
+.scan-go.running .a{display:none}
+
+/* ── MAIN VIS AREA ── */
+.vis-area{flex:1;display:grid;grid-template-columns:1fr 300px;overflow:hidden;gap:0}
+
+/* ── FLOW CANVAS ── */
+.flow-canvas{
+  overflow-y:auto;padding:28px;
+  display:flex;align-items:flex-start;justify-content:center;
+}
+.flow{width:100%;max-width:700px;display:flex;flex-direction:column;gap:0}
+
+/* INPUT NODE */
+.in-node{
+  background:var(--s2);border:1.5px solid var(--bd);border-radius:12px;
+  padding:16px 22px;display:flex;align-items:center;gap:14px;
+  transition:border-color .35s,box-shadow .35s;
+}
+.in-node.live{border-color:var(--c0);box-shadow:0 0 20px rgba(0,212,255,.08)}
+.in-ico{
+  width:40px;height:40px;border-radius:10px;background:var(--s3);
+  display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;
+}
+.in-t h4{font-family:var(--disp);font-size:13px;font-weight:700;color:#fff}
+.in-t p{font-size:11px;color:var(--t2);margin-top:3px;max-width:380px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.in-badge{margin-left:auto;font-size:10px;padding:3px 11px;border-radius:999px;border:1px solid var(--c0);color:var(--c0);background:var(--c0d);display:none;flex-shrink:0}
+.in-node.live .in-badge{display:block}
+
+/* CONNECTOR */
+.con{width:2px;height:28px;background:var(--bd);margin:0 auto;position:relative;transition:background .4s}
+.con.live{background:var(--c0)}
+.con::after{content:'';position:absolute;bottom:-6px;left:-5px;border-left:6px solid transparent;border-right:6px solid transparent;border-top:8px solid var(--bd);transition:border-top-color .4s}
+.con.live::after{border-top-color:var(--c0)}
+
+/* MODULE CARD */
+.mc{
+  background:var(--s1);border:1px solid var(--bd);border-radius:12px;
+  overflow:hidden;transition:border-color .3s,box-shadow .3s;position:relative;
+}
+.mc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--bd);transition:background .3s}
+.mc.run{border-color:var(--a0);box-shadow:0 0 28px rgba(255,204,0,.06)}
+.mc.run::before{background:var(--a0)}
+.mc.pass{border-color:var(--g0)}
+.mc.pass::before{background:var(--g0)}
+.mc.fail{border-color:var(--r0)}
+.mc.fail::before{background:var(--r0)}
+.mc.skip{opacity:.4}
+
+.mc-h{display:grid;grid-template-columns:40px 1fr auto auto;gap:12px;align-items:center;padding:14px 18px;border-bottom:1px solid var(--bd)}
+.mc-n{
+  width:36px;height:36px;border-radius:9px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--disp);font-size:14px;font-weight:800;
+  background:var(--s3);color:var(--t2);flex-shrink:0;transition:all .3s;
+}
+.mc.run .mc-n{background:var(--a0d);color:var(--a0)}
+.mc.pass .mc-n{background:var(--g0d);color:var(--g0)}
+.mc.fail .mc-n{background:var(--r0d);color:var(--r0)}
+.mc-i h3{font-family:var(--disp);font-size:13px;font-weight:700;color:#fff}
+.mc-i p{font-size:10px;color:var(--t2);margin-top:2px}
+.mc-tag{font-size:9px;letter-spacing:.5px;text-transform:uppercase;padding:3px 9px;border-radius:3px;border:1px solid var(--bd);color:var(--t2);transition:all .3s;white-space:nowrap}
+.mc.run .mc-tag{border-color:var(--a0);color:var(--a0);background:var(--a0d)}
+.mc.pass .mc-tag{border-color:var(--g0);color:var(--g0);background:var(--g0d)}
+.mc.fail .mc-tag{border-color:var(--r0);color:var(--r0);background:var(--r0d)}
+.mc-sp{width:15px;height:15px;border:2px solid var(--s3);border-top-color:var(--a0);border-radius:50%;animation:spin .6s linear infinite;display:none;flex-shrink:0}
+.mc.run .mc-sp{display:block}
+.mc-b{padding:14px 18px;min-height:52px}
+
+/* FINDINGS */
+.fl{display:flex;flex-direction:column;gap:5px}
+.fn{display:flex;align-items:flex-start;gap:9px;padding:8px 12px;border-radius:8px;border:1px solid;font-size:12px;line-height:1.5;animation:fin .25s ease}
+@keyframes fin{from{opacity:0;transform:translateY(-3px)}to{opacity:1;transform:translateY(0)}}
+.fn.CRITICAL{background:rgba(255,51,102,.07);border-color:rgba(255,51,102,.22)}
+.fn.HIGH{background:rgba(255,51,102,.05);border-color:rgba(255,51,102,.16)}
+.fn.MEDIUM{background:rgba(255,204,0,.06);border-color:rgba(255,204,0,.15)}
+.fn.LOW{background:rgba(0,212,255,.04);border-color:rgba(0,212,255,.12)}
+.fn.CLEAN{background:rgba(0,255,127,.05);border-color:rgba(0,255,127,.16)}
+.fn.INFO{background:var(--s2);border-color:var(--bd)}
+.fs{font-size:9px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;padding:2px 7px;border-radius:3px;flex-shrink:0;margin-top:2px}
+.fn.CRITICAL .fs,.fn.HIGH .fs{background:rgba(255,51,102,.18);color:var(--r0)}
+.fn.MEDIUM .fs{background:rgba(255,204,0,.14);color:var(--a0)}
+.fn.LOW .fs{background:rgba(0,212,255,.1);color:var(--c0)}
+.fn.CLEAN .fs{background:rgba(0,255,127,.11);color:var(--g0)}
+.fn.INFO .fs{background:var(--s3);color:var(--t1)}
+.fb .fm{color:var(--t0)}
+.fb .fr{font-size:10px;color:var(--t2);margin-top:2px}
+.fb .fsnip{font-size:11px;color:var(--r0);background:var(--s2);border:1px solid var(--bd);padding:4px 8px;border-radius:4px;margin-top:5px;white-space:pre;overflow-x:auto;display:block}
+
+/* CLASH */
+.cl-row{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px}
+.cc{display:flex;align-items:center;gap:4px;padding:4px 11px;border-radius:7px;border:1px solid;font-size:11px;animation:fin .2s ease}
+.cc.red{background:var(--r0d);border-color:rgba(255,51,102,.3);color:var(--r0)}
+.cc.blue{background:var(--c0d);border-color:rgba(0,212,255,.25);color:var(--c0)}
+.cc.sbx{background:var(--p0d);border-color:rgba(192,132,252,.25);color:var(--p0)}
+.cc.win{background:var(--g0d);border-color:rgba(0,255,127,.3);color:var(--g0)}
+.cc.lose{background:var(--a0d);border-color:rgba(255,204,0,.3);color:var(--a0)}
+
+/* DIFF */
+.diff{font-size:11px;line-height:1.8;background:rgba(0,0,0,.5);border:1px solid var(--bd);border-radius:8px;padding:12px;margin-top:8px;overflow-x:auto}
+.dl{display:block;white-space:pre;padding:1px 4px;border-radius:3px}
+.dl.rm{color:var(--r0);background:rgba(255,51,102,.07)}
+.dl.add{color:var(--g0);background:rgba(0,255,127,.07)}
+.dl.ctx{color:var(--t2)}
+
+/* ── RIGHT PANEL ── */
+.rpanel{
+  border-left:1px solid var(--bd);background:var(--s1);
+  display:flex;flex-direction:column;overflow:hidden;
+}
+
+/* SCORES */
+.rp-scores{padding:16px;border-bottom:1px solid var(--bd)}
+.rp-lbl{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--t2);margin-bottom:12px}
+.arc-3{display:flex;gap:8px;justify-content:space-between}
+.a3{text-align:center;flex:1}
+.a3 svg{display:block;margin:0 auto 6px}
+.av{font-family:var(--disp);font-size:20px;font-weight:800;color:var(--t2);line-height:1;transition:color .5s}
+.av.hi{color:var(--g0)}.av.mid{color:var(--a0)}.av.lo{color:var(--r0)}
+.al{font-size:9px;color:var(--t2);text-transform:uppercase;letter-spacing:1px;margin-top:3px}
+
+/* VERDICT */
+.vbar{margin-top:12px;padding:10px 14px;border-radius:7px;border:1px solid var(--bd);font-size:11px;color:var(--t2);transition:all .5s;display:flex;align-items:center;gap:8px}
+.vbar.pass{background:var(--g0d);border-color:rgba(0,255,127,.3);color:var(--g0)}
+.vbar.warn{background:var(--a0d);border-color:rgba(255,204,0,.3);color:var(--a0)}
+.vbar.fail{background:var(--r0d);border-color:rgba(255,51,102,.3);color:var(--r0)}
+
+/* STATS */
+.rp-stats{display:grid;grid-template-columns:1fr 1fr;gap:7px;padding:14px;border-bottom:1px solid var(--bd)}
+.sc{background:var(--s2);border-radius:8px;padding:11px}
+.sc-n{font-family:var(--disp);font-size:22px;font-weight:800;color:var(--t2);line-height:1;transition:color .4s}
+.sc-n.cr{color:var(--r0)}.sc-n.ca{color:var(--a0)}.sc-n.cg{color:var(--g0)}.sc-n.cc{color:var(--c0)}.sc-n.cp{color:var(--p0)}
+.sc-l{font-size:9px;color:var(--t2);text-transform:uppercase;letter-spacing:1px;margin-top:3px}
+
+/* LOG */
+.rp-log{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.log-h{padding:11px 14px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:8px}
+.log-hl{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--t2)}
+.clr-btn{margin-left:auto;font-size:10px;color:var(--t2);cursor:pointer;padding:2px 8px;border:1px solid var(--bd);border-radius:3px;background:none;transition:all .2s;font-family:var(--mono)}
+.clr-btn:hover{border-color:var(--c0);color:var(--c0)}
+.log-body{flex:1;overflow-y:auto;padding:6px 10px}
+.ll{display:flex;gap:7px;padding:4px 6px;border-radius:4px;font-size:11px;transition:background .1s}
+.ll:hover{background:var(--s2)}
+.lts{color:var(--t3);flex-shrink:0}
+.lm{color:var(--t2);flex:1}
+.ll.run .lm{color:var(--a0)}.ll.pass .lm{color:var(--g0)}.ll.fail .lm{color:var(--r0)}.ll.info .lm{color:var(--c0)}.ll.find .lm{color:var(--r0)}
+
+/* LEGEND */
+.leg{display:flex;gap:12px;flex-wrap:wrap;padding:10px 28px;background:var(--s1);border-top:1px solid var(--bd);font-size:10px;color:var(--t2);flex-shrink:0}
+.li{display:flex;align-items:center;gap:4px}
+.ld{width:7px;height:7px;border-radius:50%}
+
+/* Reconnect */
+.reconn{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:var(--a0);color:var(--bg);padding:8px 20px;border-radius:6px;font-size:12px;font-weight:600;display:none;z-index:10}
+.reconn.show{display:block}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <!-- TOP -->
+  <header class="top">
+    <div class="top-brand">
+      <div class="thex"></div>
+      <div class="tname">ZENITH</div>
+      <div class="tsub">Live Security Visualization · HACKFEST 2026</div>
+    </div>
+    <div class="top-r">
+      <div class="ws-p" id="wsp"><div class="ws-d" id="wsd"></div><span id="wsl">Offline</span></div>
+      <div class="threat-t" id="threat">LOW</div>
+      <div class="clk" id="clk">00:00:00</div>
+    </div>
+  </header>
+
+  <!-- URL BAR -->
+  <div class="urlbar">
+    <div class="url-prefix">$ zenith scan</div>
+    <input class="url-input" id="url-in" placeholder="https://github.com/org/repo  —  or  —  ./local/path  —  or try an injection: 'ignore all previous instructions'" />
+    <button class="scan-go" id="go-btn" onclick="startScan()">
+      <span class="a">&#9654; Scan</span>
+      <span class="s"></span>
+    </button>
+  </div>
+
+  <!-- VIS AREA -->
+  <div class="vis-area">
+    <!-- FLOWCHART -->
+    <div class="flow-canvas">
+      <div class="flow">
+
+        <!-- INPUT -->
+        <div class="in-node" id="vib">
+          <div class="in-ico">&#128193;</div>
+          <div class="in-t"><h4>Input source</h4><p id="vip">Paste a GitHub URL and click Scan to begin</p></div>
+          <div class="in-badge" id="vi-badge">source_code</div>
+        </div>
+
+        <div class="con" id="vc0"></div>
+
+        <!-- M1 -->
+        <div class="mc" id="vmc-1">
+          <div class="mc-h">
+            <div class="mc-n">1</div>
+            <div class="mc-i"><h3>Prompt injection shield</h3><p>ShieldGemma 2B local · DSPy InjectionClassifier · P(violation) neural score</p></div>
+            <div class="mc-sp"></div>
+            <div class="mc-tag" id="vtag-1">Waiting</div>
+          </div>
+          <div class="mc-b"><div class="fl" id="vfl-1"><div style="color:var(--t2);font-size:11px">ShieldGemma 2B scores every input — zero API cost, 50ms, runs locally</div></div></div>
+        </div>
+
+        <div class="con" id="vc1"></div>
+
+        <!-- M2 -->
+        <div class="mc" id="vmc-2">
+          <div class="mc-h">
+            <div class="mc-n">2</div>
+            <div class="mc-i"><h3>SAST · CVE · Credential audit</h3><p>Semgrep OWASP Top 10 · OSV.dev CVE API · Hardcoded credential scan · Pinecone RAG</p></div>
+            <div class="mc-sp"></div>
+            <div class="mc-tag" id="vtag-2">Waiting</div>
+          </div>
+          <div class="mc-b"><div class="fl" id="vfl-2"><div style="color:var(--t2);font-size:11px">Semgrep OWASP rules · OSV.dev free CVE database · credential regex · Pinecone breach context</div></div></div>
+        </div>
+
+        <div class="con" id="vc2"></div>
+
+        <!-- M3 -->
+        <div class="mc" id="vmc-3">
+          <div class="mc-h">
+            <div class="mc-n">3</div>
+            <div class="mc-i"><h3>Red / Blue adversarial clash</h3><p>DSPy WriteExploit → Sandbox validation → DSPy PatchCode → re-attack loop</p></div>
+            <div class="mc-sp"></div>
+            <div class="mc-tag" id="vtag-3">Waiting</div>
+          </div>
+          <div class="mc-b">
+            <div class="cl-row" id="vcl"></div>
+            <div id="vdiff"></div>
+          </div>
+        </div>
+
+        <div class="con" id="vc3"></div>
+
+        <!-- M4 -->
+        <div class="mc" id="vmc-4">
+          <div class="mc-h">
+            <div class="mc-n">4</div>
+            <div class="mc-i"><h3>Score engine + verified report</h3><p>Confidence · Robustness · Integrity · Pinecone index · JSON export</p></div>
+            <div class="mc-sp"></div>
+            <div class="mc-tag" id="vtag-4">Waiting</div>
+          </div>
+          <div class="mc-b"><div class="fl" id="vfl-4"><div style="color:var(--t2);font-size:11px">Deterministic score formula — C/R/I from findings + clash + sandbox results</div></div></div>
+        </div>
+
+        <div style="margin-top:16px">
+          <div class="leg" style="padding:10px 0;border:none;background:none">
+            <div class="li"><div class="ld" style="background:var(--r0)"></div> Critical / High</div>
+            <div class="li"><div class="ld" style="background:var(--a0)"></div> Medium / Running</div>
+            <div class="li"><div class="ld" style="background:var(--g0)"></div> Pass / Verified</div>
+            <div class="li"><div class="ld" style="background:var(--p0)"></div> RAG / Sandbox</div>
+            <div class="li"><div class="ld" style="background:var(--t2)"></div> Skipped</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="rpanel">
+      <div class="rp-scores">
+        <div class="rp-lbl">Security scores</div>
+        <div class="arc-3">
+          <div class="a3">
+            <svg width="70" height="70" viewBox="0 0 70 70">
+              <circle cx="35" cy="35" r="27" fill="none" stroke="var(--s4)" stroke-width="5"/>
+              <circle id="ac-c" cx="35" cy="35" r="27" fill="none" stroke="var(--g0)" stroke-width="5" stroke-dasharray="0 170" stroke-dashoffset="42" stroke-linecap="round" style="transition:stroke-dasharray 1.2s ease"/>
+            </svg>
+            <div class="av" id="av-c">—</div><div class="al">Conf</div>
+          </div>
+          <div class="a3">
+            <svg width="70" height="70" viewBox="0 0 70 70">
+              <circle cx="35" cy="35" r="27" fill="none" stroke="var(--s4)" stroke-width="5"/>
+              <circle id="ac-r" cx="35" cy="35" r="27" fill="none" stroke="var(--g0)" stroke-width="5" stroke-dasharray="0 170" stroke-dashoffset="42" stroke-linecap="round" style="transition:stroke-dasharray 1.2s ease"/>
+            </svg>
+            <div class="av" id="av-r">—</div><div class="al">Rob</div>
+          </div>
+          <div class="a3">
+            <svg width="70" height="70" viewBox="0 0 70 70">
+              <circle cx="35" cy="35" r="27" fill="none" stroke="var(--s4)" stroke-width="5"/>
+              <circle id="ac-i" cx="35" cy="35" r="27" fill="none" stroke="var(--g0)" stroke-width="5" stroke-dasharray="0 170" stroke-dashoffset="42" stroke-linecap="round" style="transition:stroke-dasharray 1.2s ease"/>
+            </svg>
+            <div class="av" id="av-i">—</div><div class="al">Int</div>
+          </div>
+        </div>
+        <div class="vbar" id="vbar">Awaiting scan</div>
+      </div>
+
+      <div class="rp-stats">
+        <div class="sc"><div class="sc-n" id="sn-f">0</div><div class="sc-l">Findings</div></div>
+        <div class="sc"><div class="sc-n" id="sn-cv">0</div><div class="sc-l">CVEs</div></div>
+        <div class="sc"><div class="sc-n" id="sn-cr">0</div><div class="sc-l">Cred leaks</div></div>
+        <div class="sc"><div class="sc-n" id="sn-rn">0</div><div class="sc-l">Rounds</div></div>
+        <div class="sc"><div class="sc-n" id="sn-rg">0</div><div class="sc-l">RAG hits</div></div>
+        <div class="sc"><div class="sc-n" id="sn-tm">—</div><div class="sc-l">Time (s)</div></div>
+      </div>
+
+      <div class="rp-log">
+        <div class="log-h"><div class="log-hl">Event log</div><button class="clr-btn" onclick="document.getElementById('lbody').innerHTML=''">Clear</button></div>
+        <div class="log-body" id="lbody"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="reconn" id="reconn">WebSocket disconnected — reconnecting...</div>
+</div>
+
+<script>
+const WS='ws://localhost:8000/ws';
+const API='http://localhost:8000';
+const S={running:false,ws:null,f:0,cv:0,cr:0,rn:0,rg:0,threat:'LOW',start:0};
+
+/* ── NAV ── */
+function mcS(n,s,t){ const mc=document.getElementById('vmc-'+n),mt=document.getElementById('vtag-'+n); if(mc)mc.className='mc '+s; if(mt)mt.textContent=t||s; }
+function conL(n){ const c=document.getElementById('vc'+n); if(c)c.classList.add('live'); }
+function addFN(n,sev,msg,rule,snip){
+  const el=document.getElementById('vfl-'+n); if(!el) return;
+  const ch=el.firstChild; if(ch&&ch.style&&ch.style.color===getComputedStyle(document.documentElement).getPropertyValue('--t2')) ch.remove();
+  const d=document.createElement('div'); d.className='fn '+sev;
+  d.innerHTML=`<div class="fs">${sev}</div><div class="fb"><div class="fm">${esc(msg)}</div>${rule?`<div class="fr">${esc(rule)}</div>`:''}${snip?`<code class="fsnip">${esc(snip)}</code>`:''}</div>`;
+  el.appendChild(d);
+}
+function addCC(t,l){ const el=document.getElementById('vcl'); if(!el)return; const d=document.createElement('div'); d.className='cc '+t; d.textContent=l; el.appendChild(d); }
+function setScores(c,r,i){
+  const circ=2*Math.PI*27;
+  [['c',c],['r',r],['i',i]].forEach(([k,v])=>{
+    const a=document.getElementById('ac-'+k),t=document.getElementById('av-'+k);
+    if(!a||!t)return;
+    a.style.strokeDasharray=(circ*(v/100))+' '+circ;
+    a.style.stroke=v>=75?'var(--g0)':v>=50?'var(--a0)':'var(--r0)';
+    t.textContent=Math.round(v)+'%';
+    t.className='av '+(v>=75?'hi':v>=50?'mid':'lo');
+  });
+}
+function setVerdict(txt,cls){ const el=document.getElementById('vbar'); if(!el)return; el.className='vbar '+cls; el.textContent=txt; }
+function updStats(){
+  [['f',S.f,'cr'],['cv',S.cv,'ca'],['cr',S.cr,'cr'],['rn',S.rn,'cc'],['rg',S.rg,'cp']].forEach(([k,v,c])=>{
+    const el=document.getElementById('sn-'+k); if(!el)return; el.textContent=v; if(v>0)el.classList.add(c); else el.className='sc-n';
+  });
+  if(S.start){ const el=document.getElementById('sn-tm'); if(el)el.textContent=((Date.now()-S.start)/1000).toFixed(1); }
+  const tt=document.getElementById('threat'); if(tt){tt.textContent=S.threat;tt.className='threat-t '+S.threat;}
+}
+function showDiff(){
+  const el=document.getElementById('vdiff'); if(!el)return;
+  el.innerHTML=`<div class="diff"><span class="dl rm">-    query = "SELECT * FROM users WHERE id = " + user_id</span><span class="dl add">+    return conn.execute(</span><span class="dl add">+        "SELECT id, name FROM users WHERE id = ?",</span><span class="dl add">+        (user_id.strip(),)</span><span class="dl add">+    ).fetchall()</span><span class="dl ctx">     # Parameterized — injection impossible</span></div>`;
+}
+function addLog(t,m){ const el=document.getElementById('lbody'); if(!el)return; const ts=new Date().toLocaleTimeString('en-GB',{hour12:false}); const d=document.createElement('div'); d.className='ll '+t; d.innerHTML=`<span class="lts">${ts}</span><span class="lm">${esc(m)}</span>`; el.insertBefore(d,el.firstChild); while(el.children.length>120)el.removeChild(el.lastChild); }
+
+/* ── WS ── */
+function connectWS(){
+  try{
+    S.ws=new WebSocket(WS);
+    S.ws.onopen=()=>{ document.getElementById('wsd').classList.add('on'); document.getElementById('wsl').textContent='Live'; document.getElementById('reconn').classList.remove('show'); addLog('info','WebSocket connected to pipeline'); };
+    S.ws.onmessage=e=>{try{handleEvent(JSON.parse(e.data));}catch(x){}};
+    S.ws.onclose=()=>{ document.getElementById('wsd').classList.remove('on'); document.getElementById('wsl').textContent='Offline'; document.getElementById('reconn').classList.add('show'); setTimeout(connectWS,4000); };
+    S.ws.onerror=()=>S.ws.close();
+  }catch(e){setTimeout(connectWS,5000);}
+}
+function handleEvent(ev){
+  const{module:mod,status,label,data}=ev;
+  addLog(status,`[${mod}] ${label}`);
+  if(mod==='PIPELINE'){if(status==='complete'&&data){if(data.confidence)setScores(data.confidence,data.robustness,data.integrity);if(data.threat_level)S.threat=data.threat_level;updStats();}return;}
+  if(mod==='M1'){
+    if(status==='running'){conL(0);mcS(1,'run','Scanning');}
+    else if(status==='pass'){mcS(1,'pass','Clean');addFN(1,'CLEAN','No injection detected — P(violation)='+(data&&data.shield_score||0).toFixed(3),'ShieldGemma 2B');}
+    else if(status==='fail'){mcS(1,'fail','CRITICAL');(data&&data.injections||[]).forEach(i=>{addFN(1,'CRITICAL',i,'ShieldGemma 2B');S.f++;});S.threat='CRITICAL';updStats();}
+  }
+  if(mod==='M2'){
+    if(status==='running'){conL(1);mcS(2,'run','Scanning');}
+    else{
+      mcS(2,status==='fail'?'fail':'pass',label);
+      if(data){
+        (data.sast||[]).forEach(f=>{addFN(2,f.severity,f.message,f.rule_id,f.snippet);S.f++;});
+        (data.cve||[]).forEach(f=>{addFN(2,f.severity,'CVE: '+f.cve_ids.join(', '),f.package+'=='+f.version);S.cv++;});
+        (data.creds||[]).forEach(f=>{addFN(2,'HIGH',f.type,f.snippet);S.cr++;});
+        S.rg+=(data.rag||[]).length;S.threat=data.threat_level||S.threat;updStats();
+      }
+    }
+  }
+  if(mod==='M3'){
+    if(status==='running'){
+      conL(2);mcS(3,'run',label);
+      if(label.includes('Red'))addCC('red','R'+((data&&data.round)||1)+' Attack');
+      else if(label.includes('Blue'))addCC('blue','R'+((data&&data.round)||1)+' Patch');
+      else if(label.includes('Sandbox'))addCC('sbx','SBX '+(data&&data.sandbox&&data.sandbox.succeeded?'hit':'block'));
+      S.rn=(data&&data.round)||S.rn;updStats();
+    }else{
+      mcS(3,status,label);
+      if(data&&data.verdict==='PATCHED'){addCC('win','✓ Verified');showDiff();}
+      else if(data&&data.verdict==='UNRESOLVED')addCC('lose','⚠ Unresolved');
+    }
+  }
+  if(mod==='M4'){
+    if(status==='running'){conL(3);mcS(4,'run','Scoring');}
+    else if(status==='pass'){
+      mcS(4,'pass','Complete');
+      if(data){
+        setScores(data.confidence,data.robustness,data.integrity);
+        const ok=data.patch_status==='VERIFIED';
+        setVerdict((ok?'✓ Patch VERIFIED':'⚠ Pending review')+' — C:'+Math.round(data.confidence)+'% R:'+Math.round(data.robustness)+'% I:'+Math.round(data.integrity)+'%',ok?'pass':'warn');
+      }
+    }
+  }
+}
+
+/* ── SCAN ── */
+const RAG=[
+  {score:'0.97',title:'Equifax 2017 — SQL injection',text:'147M records via string-concatenated SQL. user_id = "1 OR 1=1" dumped full table.',tags:['SQL injection']},
+  {score:'0.88',title:'Uber 2022 — hardcoded credentials',text:'Hardcoded AWS creds in private GitHub repo exposed 57M users.',tags:['hardcoded']},
+  {score:'0.81',title:'CVE-2018-1000656 — Flask DoS',text:'Flask < 1.0.2 DoS via crafted JSON. Upgrade to flask>=1.0.2.',tags:['flask','CVE']},
+];
+const isInj=()=>(document.getElementById('url-in')||{}).value?.toLowerCase().includes('ignore');
+const delay=ms=>new Promise(r=>setTimeout(r,ms));
+
+async function startScan(){
+  if(S.running)return;
+  S.running=true;S.start=Date.now();S.f=0;S.cv=0;S.cr=0;S.rn=0;S.rg=0;
+
+  // Reset
+  [1,2,3,4].forEach(n=>{ const mc=document.getElementById('vmc-'+n); if(mc)mc.className='mc'; const mt=document.getElementById('vtag-'+n); if(mt)mt.textContent='Waiting'; const fl=document.getElementById('vfl-'+n); if(fl)fl.innerHTML='<div style="color:var(--t2);font-size:11px">—</div>'; });
+  const vcl=document.getElementById('vcl'); if(vcl)vcl.innerHTML='';
+  const vd=document.getElementById('vdiff'); if(vd)vd.innerHTML='';
+  document.querySelectorAll('.con').forEach(c=>c.classList.remove('live'));
+  document.getElementById('vib').classList.remove('live');
+  setScores(0,0,0);setVerdict('Scanning...','');updStats();
+
+  const btn=document.getElementById('go-btn'); if(btn){btn.disabled=true;btn.classList.add('running');}
+  const urlVal=(document.getElementById('url-in')||{}).value||'';
+  const pp=document.getElementById('vip'); if(pp)pp.textContent=urlVal||'tests/fixtures/vulnerable.py';
+  document.getElementById('vib').classList.add('live');
+
+  addLog('info','Scan started: '+(urlVal||'demo fixture'));
+
+  try{
+    if(S.ws&&S.ws.readyState===1){
+      await fetch(API+'/api/scan',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({repo_url:urlVal.startsWith('http')?urlVal:'',prompt:urlVal&&!urlVal.startsWith('http')?urlVal:''})});
+    }else{
+      await localDemo(urlVal);
+    }
+  }catch(e){await localDemo(urlVal);}
+
+  if(btn){btn.disabled=false;btn.classList.remove('running');}
+  S.running=false;
+}
+
+async function localDemo(v){
+  const inj=isInj();
+  await delay(500);
+  handleEvent({module:'M1',status:'running',label:'ShieldGemma 2B scanning...',data:{}});
+  await delay(950);
+  if(inj){
+    handleEvent({module:'M1',status:'fail',label:'CRITICAL injection blocked',data:{injections:['ignore all previous instructions — prompt injection pattern'],shield_score:0.97}});
+    addLog('fail','[BLOCKED] Injection detected — pipeline halted at M1');
+    return;
+  }
+  handleEvent({module:'M1',status:'pass',label:'Clean',data:{shield_score:0.03,input_type:'source_code'}});
+  await delay(700);
+  handleEvent({module:'M2',status:'running',label:'Semgrep + OSV.dev + Pinecone...',data:{}});
+  await delay(1500);
+  handleEvent({module:'M2',status:'fail',label:'3 findings · 1 CVE · 2 creds',data:{
+    sast:[{severity:'HIGH',message:'SQL injection via string concatenation',rule_id:'python.sqli.string-concat',snippet:'query = "SELECT * FROM users WHERE id = " + user_id'},{severity:'HIGH',message:'Code injection via eval()',rule_id:'python.security.eval',snippet:'return eval(data)'}],
+    cve:[{severity:'HIGH',message:'DoS via crafted JSON',cve_ids:['CVE-2018-1000656'],package:'flask',version:'1.0.0'}],
+    creds:[{type:'Hardcoded password',snippet:'if password == "admin123"',severity:'HIGH'},{type:'Hardcoded API key',snippet:'flask_key = "hardcoded-secret-key-123"',severity:'HIGH'}],
+    rag:RAG,threat_level:'HIGH'
+  }});
+  await delay(700);
+  handleEvent({module:'M3',status:'running',label:'Round 1: Red Team (DSPy WriteExploit) attacking...',data:{round:1}});
+  await delay(1100);
+  handleEvent({module:'M3',status:'running',label:'Sandbox: exploit succeeded',data:{round:1,sandbox:{succeeded:true}}});
+  await delay(700);
+  handleEvent({module:'M3',status:'running',label:'Round 1: Blue Team (DSPy PatchCode) patching...',data:{round:1}});
+  await delay(1000);
+  handleEvent({module:'M3',status:'running',label:'Round 2: Red Team re-attacking patch...',data:{round:2}});
+  await delay(900);
+  handleEvent({module:'M3',status:'running',label:'Sandbox: blocked — EXPLOIT_IMPOSSIBLE',data:{round:2,sandbox:{succeeded:false}}});
+  await delay(500);
+  handleEvent({module:'M3',status:'pass',label:'PATCHED after 2 rounds',data:{verdict:'PATCHED',rounds:2}});
+  await delay(600);
+  handleEvent({module:'M4',status:'running',label:'Score engine calculating...',data:{}});
+  await delay(800);
+  handleEvent({module:'M4',status:'pass',label:'Pipeline complete',data:{confidence:94,robustness:87,integrity:100,patch_status:'VERIFIED',threat_level:'HIGH'}});
+}
+
+/* ── CLOCK ── */
+setInterval(()=>{ const el=document.getElementById('clk'); if(el)el.textContent=new Date().toLocaleTimeString(); },1000);
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+connectWS();
+addLog('info','Visualization site loaded — paste a GitHub URL to begin');
+</script>
+</body>
+</html>

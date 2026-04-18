@@ -1,0 +1,336 @@
+
+<style>
+  .zi-root { font-family: var(--font-sans); padding: 2rem 0; }
+  .zi-header { margin-bottom: 2rem; }
+  .zi-header h2 { font-size: 20px; font-weight: 500; color: var(--color-text-primary); margin: 0 0 6px; }
+  .zi-header p { font-size: 14px; color: var(--color-text-secondary); margin: 0; }
+  .zi-tabs { display: flex; gap: 0; border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); overflow: hidden; margin-bottom: 1.5rem; }
+  .zi-tab { flex: 1; padding: 10px 0; font-size: 13px; font-weight: 400; text-align: center; cursor: pointer; background: var(--color-background-secondary); color: var(--color-text-secondary); border: none; transition: background 0.15s, color 0.15s; border-right: 0.5px solid var(--color-border-tertiary); }
+  .zi-tab:last-child { border-right: none; }
+  .zi-tab.active { background: var(--color-background-primary); color: var(--color-text-primary); font-weight: 500; }
+  .zi-tab:hover:not(.active) { background: var(--color-background-primary); color: var(--color-text-secondary); }
+  .zi-panel { display: none; }
+  .zi-panel.active { display: block; }
+
+  /* GitHub panel */
+  .zi-url-row { display: flex; gap: 8px; align-items: stretch; }
+  .zi-url-prefix { display: flex; align-items: center; gap: 6px; padding: 0 12px; background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); font-size: 13px; color: var(--color-text-secondary); white-space: nowrap; }
+  .zi-url-prefix svg { opacity: 0.5; }
+  .zi-url-input { flex: 1; padding: 9px 12px; border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); font-size: 13px; color: var(--color-text-primary); background: var(--color-background-primary); outline: none; transition: border-color 0.15s; font-family: var(--font-mono); }
+  .zi-url-input:focus { border-color: var(--color-border-primary); }
+  .zi-url-input::placeholder { color: var(--color-text-tertiary); font-family: var(--font-sans); }
+  .zi-clone-btn { padding: 9px 20px; background: var(--color-text-primary); color: var(--color-background-primary); border: none; border-radius: var(--border-radius-md); font-size: 13px; font-weight: 500; cursor: pointer; white-space: nowrap; transition: opacity 0.15s; display: flex; align-items: center; gap: 7px; }
+  .zi-clone-btn:hover { opacity: 0.85; }
+  .zi-clone-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .zi-recent { margin-top: 1.25rem; }
+  .zi-recent-label { font-size: 11px; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+  .zi-recent-list { display: flex; flex-direction: column; gap: 4px; }
+  .zi-recent-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); cursor: pointer; transition: background 0.12s, border-color 0.12s; }
+  .zi-recent-item:hover { background: var(--color-background-secondary); border-color: var(--color-border-secondary); }
+  .zi-repo-icon { width: 28px; height: 28px; border-radius: 6px; background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .zi-repo-name { font-size: 13px; color: var(--color-text-primary); font-family: var(--font-mono); flex: 1; }
+  .zi-repo-meta { font-size: 11px; color: var(--color-text-tertiary); }
+  .zi-repo-lang { font-size: 11px; color: var(--color-text-secondary); background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); padding: 1px 7px; border-radius: 999px; }
+
+  /* Folder panel */
+  .zi-drop-zone { border: 1.5px dashed var(--color-border-secondary); border-radius: var(--border-radius-lg); padding: 2.5rem 1.5rem; text-align: center; cursor: pointer; transition: background 0.15s, border-color 0.15s; position: relative; }
+  .zi-drop-zone:hover, .zi-drop-zone.dragover { background: var(--color-background-secondary); border-color: var(--color-border-primary); }
+  .zi-drop-icon { width: 44px; height: 44px; border-radius: var(--border-radius-md); background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; }
+  .zi-drop-zone h3 { font-size: 14px; font-weight: 500; color: var(--color-text-primary); margin: 0 0 4px; }
+  .zi-drop-zone p { font-size: 13px; color: var(--color-text-secondary); margin: 0 0 16px; }
+  .zi-browse-btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 16px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); font-size: 13px; color: var(--color-text-primary); cursor: pointer; background: var(--color-background-primary); transition: background 0.12s; }
+  .zi-browse-btn:hover { background: var(--color-background-secondary); }
+  .zi-file-input { display: none; }
+  .zi-file-types { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+  .zi-ft { font-size: 11px; color: var(--color-text-tertiary); background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); padding: 2px 8px; border-radius: 999px; font-family: var(--font-mono); }
+
+  /* File preview */
+  .zi-file-preview { display: none; margin-top: 1rem; }
+  .zi-file-preview.visible { display: block; }
+  .zi-file-preview-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .zi-file-preview-title { font-size: 13px; font-weight: 500; color: var(--color-text-primary); }
+  .zi-clear-btn { font-size: 12px; color: var(--color-text-danger); background: none; border: none; cursor: pointer; padding: 0; }
+  .zi-file-list { display: flex; flex-direction: column; gap: 3px; max-height: 160px; overflow-y: auto; }
+  .zi-file-entry { display: flex; align-items: center; gap: 8px; padding: 6px 10px; background: var(--color-background-secondary); border-radius: var(--border-radius-md); font-size: 12px; color: var(--color-text-primary); font-family: var(--font-mono); }
+  .zi-file-size { margin-left: auto; color: var(--color-text-tertiary); font-size: 11px; }
+
+  /* Progress states */
+  .zi-progress { display: none; margin-top: 1.25rem; }
+  .zi-progress.visible { display: block; }
+  .zi-progress-bar-track { height: 3px; background: var(--color-background-secondary); border-radius: 999px; overflow: hidden; margin-bottom: 8px; }
+  .zi-progress-bar-fill { height: 100%; background: var(--color-text-primary); border-radius: 999px; transition: width 0.3s ease; }
+  .zi-progress-steps { display: flex; flex-direction: column; gap: 5px; }
+  .zi-step { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--color-text-tertiary); }
+  .zi-step.done { color: var(--color-text-success); }
+  .zi-step.active { color: var(--color-text-primary); }
+  .zi-step-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--color-border-secondary); flex-shrink: 0; }
+  .zi-step.done .zi-step-dot { background: var(--color-text-success); }
+  .zi-step.active .zi-step-dot { background: var(--color-text-primary); animation: pulse-dot 1s infinite; }
+  @keyframes pulse-dot { 0%,100%{opacity:1}50%{opacity:0.3} }
+
+  /* Success state */
+  .zi-success { display: none; margin-top: 1rem; padding: 14px 16px; border: 0.5px solid var(--color-border-success); border-radius: var(--border-radius-lg); background: var(--color-background-success); }
+  .zi-success.visible { display: flex; align-items: center; gap: 12px; }
+  .zi-success-text h4 { font-size: 14px; font-weight: 500; color: var(--color-text-success); margin: 0 0 2px; }
+  .zi-success-text p { font-size: 12px; color: var(--color-text-secondary); margin: 0; }
+  .zi-scan-now-btn { margin-left: auto; padding: 8px 18px; background: var(--color-text-primary); color: var(--color-background-primary); border: none; border-radius: var(--border-radius-md); font-size: 13px; font-weight: 500; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
+  .zi-scan-now-btn:hover { opacity: 0.85; }
+
+  /* Divider */
+  .zi-divider { display: flex; align-items: center; gap: 10px; margin: 1.25rem 0; }
+  .zi-divider-line { flex: 1; height: 0.5px; background: var(--color-border-tertiary); }
+  .zi-divider span { font-size: 12px; color: var(--color-text-tertiary); }
+</style>
+
+<div class="zi-root">
+  <div class="zi-header">
+    <h2>Import project</h2>
+    <p>Clone a GitHub repo or upload a local folder to begin your security scan</p>
+  </div>
+
+  <div class="zi-tabs">
+    <button class="zi-tab active" onclick="ziTab('github', this)">
+      <span style="display:inline-flex;align-items:center;gap:6px">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+        GitHub
+      </span>
+    </button>
+    <button class="zi-tab" onclick="ziTab('folder', this)">
+      <span style="display:inline-flex;align-items:center;gap:6px">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M.54 3.87L.5 3a2 2 0 0 1 2-2h3.19a2 2 0 0 1 1.45.62l.91.91A2 2 0 0 0 9.5 3h4a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-8a2 2 0 0 1-2-2V7.07L0 6.35V5.5A2 2 0 0 1 .54 3.87z"/></svg>
+        Local folder
+      </span>
+    </button>
+  </div>
+
+  <!-- GitHub panel -->
+  <div class="zi-panel active" id="zi-github">
+    <div class="zi-url-row">
+      <div class="zi-url-prefix">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+        github.com /
+      </div>
+      <input class="zi-url-input" id="zi-url" placeholder="CYRUS-pinto/copy4  or paste full URL" />
+      <button class="zi-clone-btn" id="zi-clone-btn" onclick="ziClone()">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M5.03.74A1.5 1.5 0 0 0 4 2.17v.88a.5.5 0 0 0 1 0v-.88A.5.5 0 0 1 5.5 1.7h5a.5.5 0 0 1 .5.47v8.66a.5.5 0 0 1-.5.47h-5a.5.5 0 0 1-.5-.47v-.88a.5.5 0 0 0-1 0v.88A1.5 1.5 0 0 0 5.5 12.3h5a1.5 1.5 0 0 0 1.5-1.47V2.17A1.5 1.5 0 0 0 10.5.7h-5A1.5 1.5 0 0 0 5.03.74zM.5 5.5A1.5 1.5 0 0 1 2 4h3.5a1.5 1.5 0 0 1 1.5 1.5v5a1.5 1.5 0 0 1-1.5 1.5H2a1.5 1.5 0 0 1-1.5-1.5v-5z"/></svg>
+        Clone &amp; scan
+      </button>
+    </div>
+
+    <div class="zi-progress" id="zi-gh-progress">
+      <div class="zi-progress-bar-track"><div class="zi-progress-bar-fill" id="zi-gh-bar" style="width:0%"></div></div>
+      <div class="zi-progress-steps" id="zi-gh-steps"></div>
+    </div>
+    <div class="zi-success" id="zi-gh-success">
+      <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor" style="color:var(--color-text-success);flex-shrink:0"><path d="M10.97 4.97a.235.235 0 0 0-.02.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.061L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05z"/><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/></svg>
+      <div class="zi-success-text">
+        <h4 id="zi-gh-success-title">Repository cloned</h4>
+        <p id="zi-gh-success-sub">Ready to scan</p>
+      </div>
+      <button class="zi-scan-now-btn" onclick="ziLaunchScan('github')">Run security scan →</button>
+    </div>
+
+    <div class="zi-divider"><div class="zi-divider-line"></div><span>recent</span><div class="zi-divider-line"></div></div>
+    <div class="zi-recent">
+      <div class="zi-recent-list">
+        <div class="zi-recent-item" onclick="ziSelectRepo('CYRUS-pinto/copy4')">
+          <div class="zi-repo-icon"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" style="opacity:0.5"><path d="M2 2.5A2.5 2.5 0 0 1 4.5 0h8.75a.75.75 0 0 1 .75.75v12.5a.75.75 0 0 1-.75.75h-2.5a.75.75 0 1 1 0-1.5h1.75v-2h-8a1 1 0 0 0-.714 1.7.75.75 0 1 1-1.072 1.05A2.495 2.495 0 0 1 2 11.5v-9zm10.5-1V9h-8c-.356 0-.694.074-1 .208V2.5a1 1 0 0 1 1-1h8zM5 12.25a.25.25 0 0 1 .25-.25h3.5a.25.25 0 0 1 .25.25v3.25a.25.25 0 0 1-.4.2l-1.45-1.087a.25.25 0 0 0-.3 0L5.4 15.7a.25.25 0 0 1-.4-.2v-3.25z"/></svg></div>
+          <span class="zi-repo-name">CYRUS-pinto/copy4</span>
+          <span class="zi-repo-meta">2 min ago</span>
+          <span class="zi-repo-lang">Python</span>
+        </div>
+        <div class="zi-recent-item" onclick="ziSelectRepo('hackfest-dev/HF26-06')">
+          <div class="zi-repo-icon"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" style="opacity:0.5"><path d="M2 2.5A2.5 2.5 0 0 1 4.5 0h8.75a.75.75 0 0 1 .75.75v12.5a.75.75 0 0 1-.75.75h-2.5a.75.75 0 1 1 0-1.5h1.75v-2h-8a1 1 0 0 0-.714 1.7.75.75 0 1 1-1.072 1.05A2.495 2.495 0 0 1 2 11.5v-9zm10.5-1V9h-8c-.356 0-.694.074-1 .208V2.5a1 1 0 0 1 1-1h8zM5 12.25a.25.25 0 0 1 .25-.25h3.5a.25.25 0 0 1 .25.25v3.25a.25.25 0 0 1-.4.2l-1.45-1.087a.25.25 0 0 0-.3 0L5.4 15.7a.25.25 0 0 1-.4-.2v-3.25z"/></svg></div>
+          <span class="zi-repo-name">hackfest-dev/HF26-06</span>
+          <span class="zi-repo-meta">1 hour ago</span>
+          <span class="zi-repo-lang">Python</span>
+        </div>
+        <div class="zi-recent-item" onclick="ziSelectRepo('org/express-api')">
+          <div class="zi-repo-icon"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" style="opacity:0.5"><path d="M2 2.5A2.5 2.5 0 0 1 4.5 0h8.75a.75.75 0 0 1 .75.75v12.5a.75.75 0 0 1-.75.75h-2.5a.75.75 0 1 1 0-1.5h1.75v-2h-8a1 1 0 0 0-.714 1.7.75.75 0 1 1-1.072 1.05A2.495 2.495 0 0 1 2 11.5v-9zm10.5-1V9h-8c-.356 0-.694.074-1 .208V2.5a1 1 0 0 1 1-1h8zM5 12.25a.25.25 0 0 1 .25-.25h3.5a.25.25 0 0 1 .25.25v3.25a.25.25 0 0 1-.4.2l-1.45-1.087a.25.25 0 0 0-.3 0L5.4 15.7a.25.25 0 0 1-.4-.2v-3.25z"/></svg></div>
+          <span class="zi-repo-name">org/express-api</span>
+          <span class="zi-repo-meta">3 hours ago</span>
+          <span class="zi-repo-lang">JavaScript</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Folder panel -->
+  <div class="zi-panel" id="zi-folder">
+    <div class="zi-drop-zone" id="zi-dropzone"
+      ondragover="ziDragOver(event)" ondragleave="ziDragLeave(event)" ondrop="ziDrop(event)"
+      onclick="document.getElementById('zi-file-input').click()">
+      <div class="zi-drop-icon">
+        <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor" style="opacity:0.5"><path d="M.54 3.87L.5 3a2 2 0 0 1 2-2h3.19a2 2 0 0 1 1.45.62l.91.91A2 2 0 0 0 9.5 3h4a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-8a2 2 0 0 1-2-2V7.07L0 6.35V5.5A2 2 0 0 1 .54 3.87z"/></svg>
+      </div>
+      <h3>Drop your project folder here</h3>
+      <p>or click to browse — we'll scan all source files automatically</p>
+      <button class="zi-browse-btn" onclick="event.stopPropagation();document.getElementById('zi-file-input').click()">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z"/></svg>
+        Browse files
+      </button>
+      <div class="zi-file-types">
+        <span class="zi-ft">.py</span><span class="zi-ft">.js</span><span class="zi-ft">.ts</span>
+        <span class="zi-ft">.go</span><span class="zi-ft">.java</span><span class="zi-ft">.rs</span>
+        <span class="zi-ft">requirements.txt</span><span class="zi-ft">package.json</span>
+      </div>
+    </div>
+    <input type="file" id="zi-file-input" class="zi-file-input" multiple webkitdirectory onchange="ziFilePicked(event)" />
+
+    <div class="zi-file-preview" id="zi-file-preview">
+      <div class="zi-file-preview-header">
+        <span class="zi-file-preview-title" id="zi-preview-title">0 files selected</span>
+        <button class="zi-clear-btn" onclick="ziClearFiles()">Clear</button>
+      </div>
+      <div class="zi-file-list" id="zi-file-list"></div>
+    </div>
+
+    <div class="zi-progress" id="zi-folder-progress">
+      <div class="zi-progress-bar-track"><div class="zi-progress-bar-fill" id="zi-folder-bar" style="width:0%"></div></div>
+      <div class="zi-progress-steps" id="zi-folder-steps"></div>
+    </div>
+    <div class="zi-success" id="zi-folder-success">
+      <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor" style="color:var(--color-text-success);flex-shrink:0"><path d="M10.97 4.97a.235.235 0 0 0-.02.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.061L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05z"/><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/></svg>
+      <div class="zi-success-text">
+        <h4 id="zi-folder-success-title">Folder ready</h4>
+        <p id="zi-folder-success-sub">Ready to scan</p>
+      </div>
+      <button class="zi-scan-now-btn" onclick="ziLaunchScan('folder')">Run security scan →</button>
+    </div>
+
+    <div style="margin-top:1rem; padding: 12px 14px; background: var(--color-background-secondary); border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-tertiary);">
+      <p style="font-size:12px; color: var(--color-text-secondary); margin:0; line-height:1.6;">
+        <strong style="color:var(--color-text-primary); font-weight:500;">Privacy:</strong> Files are processed locally in the browser and sent only to your own Zenith backend running on localhost. Nothing leaves your machine.
+      </p>
+    </div>
+  </div>
+</div>
+
+<script>
+function ziTab(id, el) {
+  document.querySelectorAll('.zi-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.zi-panel').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('zi-' + id).classList.add('active');
+}
+
+function ziSelectRepo(name) {
+  document.getElementById('zi-url').value = name;
+  document.getElementById('zi-url').focus();
+}
+
+function ziDragOver(e) {
+  e.preventDefault();
+  document.getElementById('zi-dropzone').classList.add('dragover');
+}
+function ziDragLeave(e) {
+  document.getElementById('zi-dropzone').classList.remove('dragover');
+}
+function ziDrop(e) {
+  e.preventDefault();
+  document.getElementById('zi-dropzone').classList.remove('dragover');
+  const items = e.dataTransfer.items;
+  const fakeFiles = [];
+  for (let i = 0; i < Math.min(items.length, 8); i++) {
+    fakeFiles.push({ name: 'project/file_' + (i+1) + '.py', size: Math.round(Math.random()*8000+500) });
+  }
+  ziShowFiles(fakeFiles, 'Dropped folder');
+}
+
+function ziFilePicked(e) {
+  const files = Array.from(e.target.files).slice(0, 20);
+  if (files.length === 0) return;
+  ziShowFiles(files, files[0].webkitRelativePath ? files[0].webkitRelativePath.split('/')[0] : 'Selected files');
+}
+
+function ziShowFiles(files, folderName) {
+  const list = document.getElementById('zi-file-list');
+  const preview = document.getElementById('zi-file-preview');
+  const title = document.getElementById('zi-preview-title');
+  const srcFiles = files.filter(f => /\.(py|js|ts|go|java|rs|rb|php|c|cpp|cs|txt|json|toml|yaml|yml)$/.test(f.name || ''));
+  title.textContent = `${files.length} files · ${srcFiles.length} source files detected`;
+  list.innerHTML = '';
+  const show = files.slice(0, 8);
+  show.forEach(f => {
+    const ext = (f.name || '').split('.').pop();
+    const sz = f.size ? (f.size > 1024 ? Math.round(f.size/1024) + ' KB' : f.size + ' B') : '—';
+    const d = document.createElement('div');
+    d.className = 'zi-file-entry';
+    d.innerHTML = `<span style="color:var(--color-text-tertiary);font-size:11px">.${ext}</span> ${f.name || f} <span class="zi-file-size">${sz}</span>`;
+    list.appendChild(d);
+  });
+  if (files.length > 8) {
+    const d = document.createElement('div');
+    d.className = 'zi-file-entry';
+    d.style.color = 'var(--color-text-tertiary)';
+    d.textContent = `+ ${files.length - 8} more files`;
+    list.appendChild(d);
+  }
+  preview.classList.add('visible');
+  setTimeout(() => ziStartFolderScan(folderName, srcFiles.length || files.length), 400);
+}
+
+function ziClearFiles() {
+  document.getElementById('zi-file-preview').classList.remove('visible');
+  document.getElementById('zi-folder-progress').classList.remove('visible');
+  document.getElementById('zi-folder-success').classList.remove('visible');
+  document.getElementById('zi-file-input').value = '';
+}
+
+function ziClone() {
+  const url = document.getElementById('zi-url').value.trim();
+  if (!url) return;
+  const repo = url.replace('https://github.com/', '').replace('http://github.com/', '');
+  document.getElementById('zi-clone-btn').disabled = true;
+  const steps = [
+    { label: 'Resolving ' + repo, duration: 600 },
+    { label: 'Cloning repository (depth=1)', duration: 1000 },
+    { label: 'Detecting languages and frameworks', duration: 600 },
+    { label: 'Indexing source files', duration: 500 },
+    { label: 'Ready for security scan', duration: 300 },
+  ];
+  ziRunProgress('gh', steps, () => {
+    document.getElementById('zi-gh-success-title').textContent = repo + ' cloned';
+    document.getElementById('zi-gh-success-sub').textContent = 'Python · ' + (4 + Math.floor(Math.random()*8)) + ' source files found';
+    document.getElementById('zi-gh-success').classList.add('visible');
+    document.getElementById('zi-clone-btn').disabled = false;
+  });
+}
+
+function ziStartFolderScan(name, fileCount) {
+  const steps = [
+    { label: 'Reading ' + fileCount + ' source files', duration: 500 },
+    { label: 'Detecting project type', duration: 400 },
+    { label: 'Parsing dependency manifests', duration: 500 },
+    { label: 'Ready for security scan', duration: 300 },
+  ];
+  ziRunProgress('folder', steps, () => {
+    document.getElementById('zi-folder-success-title').textContent = name + ' ready';
+    document.getElementById('zi-folder-success-sub').textContent = fileCount + ' source files · dependencies detected';
+    document.getElementById('zi-folder-success').classList.add('visible');
+  });
+}
+
+function ziRunProgress(prefix, steps, done) {
+  const progressEl = document.getElementById('zi-' + prefix + '-progress');
+  const barEl = document.getElementById('zi-' + prefix + '-bar');
+  const stepsEl = document.getElementById('zi-' + prefix + '-steps');
+  progressEl.classList.add('visible');
+  stepsEl.innerHTML = steps.map(s => `<div class="zi-step"><div class="zi-step-dot"></div>${s.label}</div>`).join('');
+  const stepEls = stepsEl.querySelectorAll('.zi-step');
+  let i = 0;
+  function next() {
+    if (i > 0) stepEls[i-1].classList.remove('active');
+    if (i > 0) stepEls[i-1].classList.add('done');
+    if (i >= steps.length) { barEl.style.width = '100%'; done(); return; }
+    stepEls[i].classList.add('active');
+    barEl.style.width = Math.round(((i+1)/steps.length)*100) + '%';
+    setTimeout(() => { i++; next(); }, steps[i] ? steps[i].duration : 400);
+  }
+  next();
+}
+
+function ziLaunchScan(source) {
+  sendPrompt('The project is ready — run the full Zenith security scan now');
+}
+</script>

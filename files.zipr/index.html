@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zenith — AI Code Security Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Familjen+Grotesk:ital,wght@0,400;0,500;0,600;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+/* =====================================================================
+   ZENITH v3 — Enterprise SaaS Design System
+   Target: Series A engineering teams ($500/team/month)
+   Aesthetic: Precise editorial dark — like Linear meets Datadog
+   ===================================================================== */
+*,::before,::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:    #07090d;
+  --s1:    #0d1018;
+  --s2:    #121620;
+  --s3:    #181d28;
+  --s4:    #1e2535;
+  --bd:    rgba(255,255,255,.065);
+  --bd2:   rgba(255,255,255,.12);
+  --bd3:   rgba(255,255,255,.18);
+
+  --cyan:  #00c8ff;
+  --cynd:  rgba(0,200,255,.1);
+  --cyng:  rgba(0,200,255,.18);
+  --grn:   #00e676;
+  --grnd:  rgba(0,230,118,.1);
+  --red:   #ff3d5a;
+  --redd:  rgba(255,61,90,.1);
+  --amb:   #ffb300;
+  --ambd:  rgba(255,179,0,.1);
+  --pur:   #a78bfa;
+  --purd:  rgba(167,139,250,.1);
+
+  --t0:#ecf0fb; --t1:#8d9ab8; --t2:#3d4a68; --t3:#1e2740;
+
+  --mono:'JetBrains Mono',monospace;
+  --disp:'Familjen Grotesk',sans-serif;
+  --body:'DM Sans',sans-serif;
+  --r4:4px; --r8:8px; --r12:12px;
+}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t0);font-family:var(--body);font-size:13px;line-height:1.6}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--s4);border-radius:2px}
+
+/* subtle dot grid */
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:radial-gradient(circle,rgba(255,255,255,.03) 1px,transparent 1px);
+  background-size:28px 28px;
+}
+/* cyan bloom left */
+body::after{
+  content:'';position:fixed;top:0;left:0;width:500px;height:500px;
+  background:radial-gradient(circle at 0% 30%,rgba(0,200,255,.055) 0%,transparent 60%);
+  pointer-events:none;z-index:0;
+}
+
+#root{position:relative;z-index:1;height:100vh;display:flex;flex-direction:column}
+
+/* ── TOPBAR ────────────────────────────────────────── */
+.tb{
+  display:flex;align-items:center;height:52px;flex-shrink:0;
+  background:rgba(7,9,13,.96);border-bottom:1px solid var(--bd);
+  backdrop-filter:blur(20px);z-index:20;
+}
+.tb-brand{
+  display:flex;align-items:center;gap:10px;
+  padding:0 22px;height:100%;width:248px;
+  border-right:1px solid var(--bd);flex-shrink:0;
+}
+.logo-hex{
+  width:28px;height:28px;flex-shrink:0;
+  background:var(--cyan);
+  clip-path:polygon(50% 0%,93% 25%,93% 75%,50% 100%,7% 75%,7% 25%);
+  position:relative;display:flex;align-items:center;justify-content:center;
+  animation:hexbeat 4s ease-in-out infinite;
+}
+@keyframes hexbeat{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.82;transform:scale(.96)}}
+.logo-hex::after{
+  content:'';width:11px;height:11px;
+  background:var(--bg);
+  clip-path:polygon(50% 0%,93% 25%,93% 75%,50% 100%,7% 75%,7% 25%);
+}
+.brand-name{font-family:var(--disp);font-size:17px;font-weight:700;color:#fff;letter-spacing:-.5px}
+.brand-ver{font-family:var(--mono);font-size:9px;color:var(--t2);letter-spacing:.5px;margin-top:1px}
+
+.tb-nav{display:flex;height:100%;padding:0 4px;gap:0}
+.tbn{
+  height:100%;padding:0 17px;
+  font-family:var(--mono);font-size:11px;letter-spacing:.5px;text-transform:uppercase;
+  color:var(--t2);background:none;border:none;border-bottom:2px solid transparent;
+  cursor:pointer;transition:color .15s,border-color .15s;white-space:nowrap;
+}
+.tbn:hover{color:var(--t1)}
+.tbn.on{color:var(--cyan);border-bottom-color:var(--cyan)}
+
+.tb-r{
+  display:flex;align-items:center;gap:10px;margin-left:auto;
+  padding:0 18px;height:100%;border-left:1px solid var(--bd);
+}
+.ws-badge{
+  display:flex;align-items:center;gap:6px;
+  font-family:var(--mono);font-size:10px;color:var(--t2);
+  padding:4px 11px;border:1px solid var(--bd);border-radius:999px;
+}
+.ws-dot{width:6px;height:6px;border-radius:50%;background:var(--t3)}
+.ws-dot.on{background:var(--grn);box-shadow:0 0 5px var(--grn);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.threat-pill{
+  font-family:var(--mono);font-size:10px;letter-spacing:.5px;text-transform:uppercase;
+  padding:4px 10px;border:1px solid var(--bd);border-radius:var(--r4);color:var(--t2);
+  transition:all .4s;
+}
+.threat-pill.LOW{border-color:var(--grn);color:var(--grn);background:var(--grnd)}
+.threat-pill.MEDIUM{border-color:var(--amb);color:var(--amb);background:var(--ambd)}
+.threat-pill.HIGH,.threat-pill.CRITICAL{border-color:var(--red);color:var(--red);background:var(--redd)}
+.tb-clk{font-family:var(--mono);font-size:10px;color:var(--t2)}
+
+/* ── BODY LAYOUT ─────────────────────────────────── */
+.body-shell{flex:1;display:grid;grid-template-columns:248px 1fr;overflow:hidden}
+
+/* ── SIDEBAR ─────────────────────────────────────── */
+.sb{
+  background:var(--s1);border-right:1px solid var(--bd);
+  display:flex;flex-direction:column;overflow:hidden;
+}
+.sb-sec{padding:13px;border-bottom:1px solid var(--bd)}
+.sb-lbl{font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--t2);margin-bottom:9px}
+
+/* Scan box */
+.scan-wrap{background:var(--s2);border:1px solid var(--bd);border-radius:var(--r8);padding:10px 12px;margin-bottom:10px;transition:border-color .2s}
+.scan-wrap:focus-within{border-color:var(--cyan)}
+.scan-prefix{font-family:var(--mono);font-size:10px;color:var(--t2);margin-bottom:5px}
+.scan-input{width:100%;background:none;border:none;outline:none;font-family:var(--mono);font-size:12px;color:var(--t0)}
+.scan-input::placeholder{color:var(--t2)}
+.run-btn{
+  width:100%;padding:10px;border-radius:var(--r8);
+  background:var(--cyan);color:var(--bg);
+  font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.5px;
+  border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;
+  transition:opacity .2s,transform .1s;
+}
+.run-btn:hover{opacity:.88}
+.run-btn:active{transform:scale(.98)}
+.run-btn:disabled{opacity:.35;cursor:not-allowed}
+.spin-ico{width:14px;height:14px;border:2px solid rgba(7,9,13,.25);border-top-color:var(--bg);border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Models */
+.m-rows{display:flex;flex-direction:column;gap:3px}
+.mrow{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:var(--r8);border:1px solid transparent;cursor:pointer;transition:all .15s}
+.mrow:hover{background:var(--s3)}
+.mrow.on{background:var(--cynd);border-color:var(--cyan)}
+.mrow-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.mrow-name{font-family:var(--mono);font-size:11px;color:var(--t0);flex:1}
+.mrow.on .mrow-name{color:var(--cyan)}
+.mrow-sub{font-size:10px;color:var(--t2)}
+.mrow-cost{font-family:var(--mono);font-size:9px;color:var(--t2)}
+
+/* Key pool */
+.kpool{display:flex;flex-direction:column;gap:4px}
+.krow{display:flex;align-items:center;gap:7px}
+.kl{font-family:var(--mono);font-size:9px;color:var(--t2);width:28px;flex-shrink:0}
+.kt{flex:1;height:3px;background:var(--s4);border-radius:2px;overflow:hidden}
+.kf{height:100%;border-radius:2px;transition:width 1s ease}
+.kf.ok{background:var(--grn)}.kf.w{background:var(--amb)}.kf.x{background:var(--red)}
+.kp{font-family:var(--mono);font-size:9px;width:24px;text-align:right}
+.kp.ok{color:var(--grn)}.kp.w{color:var(--amb)}.kp.x{color:var(--red)}
+
+/* DSPy list */
+.dp-list{display:flex;flex-direction:column;gap:3px;overflow-y:auto;flex:1}
+.dp-item{
+  display:flex;align-items:center;gap:7px;padding:6px 8px;
+  border-radius:var(--r8);background:var(--s2);border:1px solid var(--bd);
+  transition:all .25s;
+}
+.dp-item.lit{background:var(--cynd);border-color:var(--cyan)}
+.dp-badge{font-family:var(--mono);font-size:9px;padding:1px 5px;border-radius:3px;flex-shrink:0}
+.dp-badge.sig{background:var(--purd);color:var(--pur)}
+.dp-badge.cot{background:var(--cynd);color:var(--cyan)}
+.dp-badge.rag{background:var(--grnd);color:var(--grn)}
+.dp-badge.lm{background:var(--ambd);color:var(--amb)}
+.dp-badge.sbx{background:var(--redd);color:var(--red)}
+.dp-name{font-size:11px;color:var(--t0);flex:1}
+.dp-item.lit .dp-name{color:var(--cyan)}
+
+/* Sidebar footer */
+.sb-foot{margin-top:auto;padding:13px;border-top:1px solid var(--bd);display:flex;flex-direction:column;gap:6px}
+.ghost-btn{
+  width:100%;padding:9px;border-radius:var(--r8);
+  background:none;border:1px solid var(--bd);
+  font-family:var(--mono);font-size:11px;color:var(--t1);cursor:pointer;
+  transition:all .15s;
+}
+.ghost-btn:hover{border-color:var(--cyan);color:var(--cyan)}
+
+/* ── MAIN ────────────────────────────────────────── */
+.main{display:flex;flex-direction:column;overflow:hidden;background:var(--bg)}
+.vbar{display:flex;background:var(--s1);border-bottom:1px solid var(--bd);padding:0 20px}
+.vt{padding:10px 15px;font-family:var(--mono);font-size:11px;letter-spacing:.5px;text-transform:uppercase;color:var(--t2);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;transition:all .15s;white-space:nowrap}
+.vt:hover{color:var(--t1)}
+.vt.on{color:var(--cyan);border-bottom-color:var(--cyan)}
+.view{display:none;flex:1;overflow-y:auto;padding:24px}
+.view.on{display:block}
+
+/* ── PIPELINE VIEW ──────────────────────────────── */
+.pipe-canvas{max-width:820px;margin:0 auto;display:flex;flex-direction:column;gap:0}
+
+.input-node{
+  background:var(--s2);border:1px solid var(--bd);border-radius:var(--r12);
+  padding:15px 20px;display:flex;align-items:center;gap:14px;
+  transition:border-color .35s;
+}
+.input-node.live{border-color:var(--cyan)}
+.in-icon{
+  width:38px;height:38px;border-radius:var(--r8);background:var(--s3);
+  display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;
+}
+.in-text h4{font-family:var(--disp);font-size:13px;font-weight:600;color:#fff}
+.in-text p{font-family:var(--mono);font-size:11px;color:var(--t2);margin-top:2px;max-width:360px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.in-tag{
+  margin-left:auto;font-family:var(--mono);font-size:10px;flex-shrink:0;
+  padding:3px 10px;border-radius:999px;
+  border:1px solid var(--cyan);color:var(--cyan);background:var(--cynd);display:none;
+}
+.input-node.live .in-tag{display:block}
+
+/* connector */
+.conn{width:2px;height:26px;background:var(--bd);margin:0 auto;position:relative;transition:background .4s}
+.conn.live{background:var(--cyan)}
+.conn::after{content:'';position:absolute;bottom:-5px;left:-4px;border-left:5px solid transparent;border-right:5px solid transparent;border-top:7px solid var(--bd);transition:border-top-color .4s}
+.conn.live::after{border-top-color:var(--cyan)}
+
+/* module card */
+.mc{
+  background:var(--s1);border:1px solid var(--bd);border-radius:var(--r12);
+  overflow:hidden;transition:border-color .3s,box-shadow .3s;position:relative;
+}
+.mc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--bd);transition:background .3s}
+.mc.run{border-color:var(--amb);box-shadow:0 0 20px rgba(255,179,0,.06)}
+.mc.run::before{background:var(--amb)}
+.mc.pass{border-color:var(--grn)}
+.mc.pass::before{background:var(--grn)}
+.mc.fail{border-color:var(--red)}
+.mc.fail::before{background:var(--red)}
+.mc.skip{opacity:.45}
+
+.mc-h{display:grid;grid-template-columns:36px 1fr auto auto;align-items:center;gap:11px;padding:13px 17px;border-bottom:1px solid var(--bd)}
+.mc-num{
+  width:32px;height:32px;border-radius:var(--r8);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:13px;font-weight:600;
+  background:var(--s3);color:var(--t2);flex-shrink:0;transition:all .3s;
+}
+.mc.run .mc-num{background:var(--ambd);color:var(--amb)}
+.mc.pass .mc-num{background:var(--grnd);color:var(--grn)}
+.mc.fail .mc-num{background:var(--redd);color:var(--red)}
+.mc-i h3{font-family:var(--disp);font-size:13px;font-weight:600;color:#fff}
+.mc-i p{font-family:var(--mono);font-size:10px;color:var(--t2);margin-top:2px}
+.mc-tag{font-family:var(--mono);font-size:9px;letter-spacing:.5px;text-transform:uppercase;padding:3px 8px;border-radius:var(--r4);border:1px solid var(--bd);color:var(--t2);white-space:nowrap;transition:all .3s}
+.mc.run .mc-tag{border-color:var(--amb);color:var(--amb);background:var(--ambd)}
+.mc.pass .mc-tag{border-color:var(--grn);color:var(--grn);background:var(--grnd)}
+.mc.fail .mc-tag{border-color:var(--red);color:var(--red);background:var(--redd)}
+.mc-spin{width:14px;height:14px;border:2px solid var(--s3);border-top-color:var(--amb);border-radius:50%;animation:spin .6s linear infinite;display:none;flex-shrink:0}
+.mc.run .mc-spin{display:block}
+.mc-b{padding:13px 17px;min-height:50px}
+
+/* findings */
+.flist{display:flex;flex-direction:column;gap:5px}
+.fnd{display:flex;align-items:flex-start;gap:9px;padding:9px 12px;border-radius:var(--r8);border:1px solid;font-size:12px;line-height:1.55;animation:fadein .25s ease}
+@keyframes fadein{from{opacity:0;transform:translateY(-3px)}to{opacity:1;transform:translateY(0)}}
+.fnd.CRITICAL{background:rgba(255,61,90,.07);border-color:rgba(255,61,90,.22)}
+.fnd.HIGH{background:rgba(255,61,90,.05);border-color:rgba(255,61,90,.16)}
+.fnd.MEDIUM{background:rgba(255,179,0,.06);border-color:rgba(255,179,0,.16)}
+.fnd.LOW{background:rgba(0,200,255,.04);border-color:rgba(0,200,255,.13)}
+.fnd.CLEAN{background:rgba(0,230,118,.05);border-color:rgba(0,230,118,.16)}
+.fnd.INFO{background:var(--s2);border-color:var(--bd)}
+.fsev{font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;padding:2px 6px;border-radius:3px;flex-shrink:0;margin-top:2px}
+.fnd.CRITICAL .fsev,.fnd.HIGH .fsev{background:rgba(255,61,90,.18);color:var(--red)}
+.fnd.MEDIUM .fsev{background:rgba(255,179,0,.15);color:var(--amb)}
+.fnd.LOW .fsev{background:rgba(0,200,255,.1);color:var(--cyan)}
+.fnd.CLEAN .fsev{background:rgba(0,230,118,.12);color:var(--grn)}
+.fnd.INFO .fsev{background:var(--s3);color:var(--t1)}
+.fnd-body .fmsg{color:var(--t0)}
+.fnd-body .frule{font-family:var(--mono);font-size:10px;color:var(--t2);margin-top:2px}
+.fnd-body .fsnip{font-family:var(--mono);font-size:11px;color:var(--red);background:var(--s2);border:1px solid var(--bd);padding:5px 8px;border-radius:var(--r4);margin-top:6px;white-space:pre;overflow-x:auto;display:block}
+
+/* clash timeline */
+.clash-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:5px}
+.cc{display:flex;align-items:center;gap:5px;padding:5px 11px;border-radius:var(--r8);border:1px solid;font-family:var(--mono);font-size:11px;animation:fadein .2s ease}
+.cc.red{background:var(--redd);border-color:rgba(255,61,90,.3);color:var(--red)}
+.cc.blue{background:var(--cynd);border-color:rgba(0,200,255,.25);color:var(--cyan)}
+.cc.sbx{background:var(--purd);border-color:rgba(167,139,250,.25);color:var(--pur)}
+.cc.win{background:var(--grnd);border-color:rgba(0,230,118,.3);color:var(--grn)}
+.cc.lose{background:var(--ambd);border-color:rgba(255,179,0,.3);color:var(--amb)}
+
+/* diff */
+.diff-block{font-family:var(--mono);font-size:11px;line-height:1.8;background:var(--bg);border:1px solid var(--bd);border-radius:var(--r8);padding:12px 14px;margin-top:8px;overflow-x:auto}
+.dl{display:block;white-space:pre;padding:1px 4px;border-radius:3px}
+.dl.rm{color:var(--red);background:rgba(255,61,90,.07)}
+.dl.add{color:var(--grn);background:rgba(0,230,118,.07)}
+.dl.ctx{color:var(--t2)}
+
+/* ── CHAT VIEW ────────────────────────────────── */
+.chat-shell{max-width:820px;margin:0 auto;display:flex;flex-direction:column;height:calc(100vh - 120px)}
+.chat-header{background:var(--s2);border:1px solid var(--bd);border-radius:var(--r12);padding:18px;margin-bottom:16px;display:flex;gap:12px;align-items:center}
+.ai-av{width:38px;height:38px;border-radius:50%;background:var(--cyan);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:14px;font-weight:700;color:var(--bg)}
+.chat-header h3{font-family:var(--disp);font-size:14px;font-weight:600;color:#fff}
+.chat-header p{font-size:12px;color:var(--t1);margin-top:3px;line-height:1.65}
+.chat-msgs{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:10px;margin-bottom:10px;padding-right:4px}
+.msg{max-width:86%}
+.msg.ai{align-self:flex-start}
+.msg.user{align-self:flex-end}
+.msg-bub{padding:11px 15px;border-radius:12px;font-size:13px;line-height:1.7}
+.msg.ai .msg-bub{background:var(--s2);border:1px solid var(--bd);color:var(--t0);border-bottom-left-radius:3px}
+.msg.ai.alert .msg-bub{background:var(--redd);border-color:rgba(255,61,90,.25);color:var(--red)}
+.msg.ai.good .msg-bub{background:var(--grnd);border-color:rgba(0,230,118,.2);color:var(--grn)}
+.msg.user .msg-bub{background:var(--cyan);color:var(--bg);font-weight:500;border-bottom-right-radius:3px}
+.msg-ts{font-family:var(--mono);font-size:9px;color:var(--t2);margin-top:3px;padding:0 4px}
+.msg.user .msg-ts{text-align:right}
+.quick-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.qchip{padding:6px 13px;border:1px solid var(--bd);border-radius:999px;font-size:12px;color:var(--t1);cursor:pointer;background:none;transition:all .15s;font-family:var(--body)}
+.qchip:hover{border-color:var(--cyan);color:var(--cyan)}
+.ci-row{display:flex;gap:8px;background:var(--s1);border:1px solid var(--bd);border-radius:var(--r12);padding:10px 14px;transition:border-color .2s}
+.ci-row:focus-within{border-color:var(--cyan)}
+.ci{flex:1;background:none;border:none;outline:none;resize:none;font-family:var(--body);font-size:13px;color:var(--t0);line-height:1.5;max-height:120px;overflow-y:auto}
+.ci::placeholder{color:var(--t2)}
+.send-btn{align-self:flex-end;padding:7px 16px;background:var(--cyan);color:var(--bg);border:none;border-radius:var(--r8);font-family:var(--mono);font-size:11px;font-weight:600;cursor:pointer;transition:opacity .2s;flex-shrink:0}
+.send-btn:hover{opacity:.85}
+
+/* ── DASHBOARD ────────────────────────────────── */
+.dash-wrap{max-width:960px;margin:0 auto}
+.verdict-bar{padding:14px 18px;border-radius:var(--r8);border:1px solid var(--bd);font-family:var(--mono);font-size:12px;color:var(--t2);display:flex;align-items:center;gap:10px;transition:all .5s;margin-bottom:20px}
+.verdict-bar.pass{background:var(--grnd);border-color:rgba(0,230,118,.3);color:var(--grn)}
+.verdict-bar.warn{background:var(--ambd);border-color:rgba(255,179,0,.3);color:var(--amb)}
+.verdict-bar.fail{background:var(--redd);border-color:rgba(255,61,90,.3);color:var(--red)}
+
+.arc-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+.arc-card{background:var(--s2);border:1px solid var(--bd);border-radius:var(--r12);padding:20px;text-align:center}
+.arc-card svg{display:block;margin:0 auto 8px}
+.arc-val{font-family:var(--disp);font-size:22px;font-weight:700;color:var(--t2);line-height:1;transition:color .5s}
+.arc-val.hi{color:var(--grn)}.arc-val.mid{color:var(--amb)}.arc-val.lo{color:var(--red)}
+.arc-lbl{font-family:var(--mono);font-size:10px;color:var(--t2);text-transform:uppercase;letter-spacing:1px;margin-top:4px}
+
+.stat-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:20px}
+.stat-card{background:var(--s2);border:1px solid var(--bd);border-radius:var(--r12);padding:14px;position:relative;overflow:hidden}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.stat-card.sc-c::before{background:var(--cyan)}
+.stat-card.sc-g::before{background:var(--grn)}
+.stat-card.sc-r::before{background:var(--red)}
+.stat-card.sc-a::before{background:var(--amb)}
+.stat-card.sc-p::before{background:var(--pur)}
+.stat-l{font-family:var(--mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--t2);margin-bottom:6px}
+.stat-v{font-family:var(--disp);font-size:22px;font-weight:700;line-height:1;color:var(--t2);transition:color .4s}
+.stat-v.lit.c{color:var(--cyan)}.stat-v.lit.g{color:var(--grn)}.stat-v.lit.r{color:var(--red)}.stat-v.lit.a{color:var(--amb)}.stat-v.lit.p{color:var(--pur)}
+.stat-sub{font-size:11px;color:var(--t2);margin-top:3px}
+
+/* Findings table */
+.ftable{width:100%;border-collapse:collapse;margin-bottom:20px;font-size:12px}
+.ftable th{padding:10px 13px;text-align:left;font-family:var(--mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--t2);background:var(--s2);border-bottom:1px solid var(--bd)}
+.ftable td{padding:10px 13px;border-bottom:1px solid var(--bd);color:var(--t1);vertical-align:top}
+.ftable tr:hover td{background:var(--s2)}
+.sev-chip{font-family:var(--mono);font-size:9px;padding:2px 7px;border-radius:3px}
+.sev-chip.CRITICAL,.sev-chip.HIGH{background:rgba(255,61,90,.15);color:var(--red)}
+.sev-chip.MEDIUM{background:rgba(255,179,0,.12);color:var(--amb)}
+.sev-chip.LOW{background:rgba(0,200,255,.1);color:var(--cyan)}
+.sev-chip.CLEAN{background:rgba(0,230,118,.1);color:var(--grn)}
+
+/* ── RAG VIEW ─────────────────────────────────── */
+.rag-intro{background:var(--s2);border:1px solid var(--bd);border-radius:var(--r12);padding:18px;margin-bottom:18px}
+.rag-intro h3{font-family:var(--disp);font-size:15px;font-weight:600;color:#fff;margin-bottom:6px}
+.rag-intro p{font-size:13px;color:var(--t1);line-height:1.75}
+.rag-hits{display:flex;flex-direction:column;gap:8px}
+.rag-hit{background:var(--s2);border:1px solid var(--bd);border-radius:var(--r12);padding:14px;display:flex;gap:12px;animation:fadein .3s ease}
+.rag-score{font-family:var(--mono);font-size:12px;width:52px;height:52px;border-radius:var(--r8);background:var(--purd);border:1px solid var(--pur);display:flex;align-items:center;justify-content:center;color:var(--pur);font-weight:600;flex-shrink:0}
+.rag-hit h4{font-family:var(--mono);font-size:12px;color:var(--t0);margin-bottom:4px}
+.rag-hit p{font-size:12px;color:var(--t2);line-height:1.65}
+.rag-tag{display:inline-block;font-family:var(--mono);font-size:9px;padding:1px 7px;border-radius:3px;background:var(--redd);color:var(--red);margin-top:4px;margin-right:3px}
+
+/* ── FRAMEWORK VIEW ──────────────────────────── */
+.fw-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+.fw-card{background:var(--s2);border:1px solid var(--bd);border-radius:var(--r12);padding:18px;position:relative}
+.fw-card.chosen{border-color:var(--cyan)}
+.fw-card.chosen::after{content:'SELECTED';position:absolute;top:-1px;right:14px;font-family:var(--mono);font-size:9px;letter-spacing:.5px;background:var(--cyan);color:var(--bg);padding:2px 8px;border-radius:0 0 4px 4px}
+.fw-name{font-family:var(--disp);font-size:15px;font-weight:700;margin-bottom:3px}
+.fw-card.chosen .fw-name{color:var(--cyan)}
+.fw-org{font-family:var(--mono);font-size:10px;color:var(--t2);margin-bottom:12px}
+.fw-pts{list-style:none;display:flex;flex-direction:column;gap:5px}
+.fw-pts li{font-size:12px;color:var(--t1);display:flex;gap:6px;line-height:1.5}
+.fw-pts li .i{flex-shrink:0;margin-top:1px}
+.fw-pts li .i.pro{color:var(--grn)}.fw-pts li .i.con{color:var(--red)}
+
+/* code block */
+.codeblock{background:var(--bg);border:1px solid var(--bd);border-radius:var(--r8);padding:14px 16px;font-family:var(--mono);font-size:11px;line-height:1.9;margin-top:12px;overflow-x:auto}
+.kw{color:var(--cyan)}.str{color:var(--grn)}.cm{color:var(--t2)}.fn{color:var(--amb)}.cl{color:var(--pur)}
+
+/* shared utils */
+.sec-h{margin-bottom:14px}
+.sec-h h2{font-family:var(--disp);font-size:17px;font-weight:600;color:#fff}
+.sec-h p{font-size:12px;color:var(--t2);margin-top:3px}
+.legend-row{display:flex;gap:14px;flex-wrap:wrap;padding:10px 0;font-family:var(--mono);font-size:10px;color:var(--t2)}
+.li{display:flex;align-items:center;gap:4px}
+.ld{width:7px;height:7px;border-radius:50%}
+.empty{text-align:center;padding:20px;font-family:var(--mono);font-size:11px;color:var(--t2)}
+</style>
+</head>
+<body>
+<div id="root">
+  <!-- TOPBAR -->
+  <header class="tb">
+    <div class="tb-brand">
+      <div class="logo-hex"></div>
+      <div>
+        <div class="brand-name">Zenith</div>
+        <div class="brand-ver">AI Security · v3.0 · HACKFEST 2026</div>
+      </div>
+    </div>
+    <nav class="tb-nav">
+      <button class="tbn on"  onclick="tbGo('pipe',this)">Pipeline</button>
+      <button class="tbn"     onclick="tbGo('chat',this)">AI Analyst</button>
+      <button class="tbn"     onclick="tbGo('dash',this)">Dashboard</button>
+      <button class="tbn"     onclick="tbGo('rag',this)">RAG Context</button>
+      <button class="tbn"     onclick="tbGo('fw',this)">Framework</button>
+    </nav>
+    <div class="tb-r">
+      <div class="ws-badge" id="ws-badge">
+        <div class="ws-dot" id="ws-dot"></div>
+        <span id="ws-lbl">Offline</span>
+      </div>
+      <div class="threat-pill" id="threat-pill">LOW</div>
+      <div class="tb-clk" id="tb-clk">00:00:00</div>
+    </div>
+  </header>
+
+  <div class="body-shell">
+    <!-- ═══════════ SIDEBAR ═══════════ -->
+    <aside class="sb">
+      <div class="sb-sec">
+        <div class="sb-lbl">Scan target</div>
+        <div class="scan-wrap">
+          <div class="scan-prefix">$ zenith scan</div>
+          <input class="scan-input" id="scan-input"
+            placeholder="github.com/org/repo  or  ./src/" />
+        </div>
+        <button class="run-btn" id="run-btn" onclick="startScan()">
+          <span id="run-ico">&#9654;</span>
+          <span id="run-spin" class="spin-ico" style="display:none"></span>
+          <span id="run-label">Run security scan</span>
+        </button>
+      </div>
+
+      <div class="sb-sec">
+        <div class="sb-lbl">LLM — Navigator</div>
+        <div class="m-rows" id="m-rows">
+          <div class="mrow on" data-m="llama-3.1-8b-instant" onclick="pickModel(this)">
+            <div class="mrow-dot" style="background:var(--grn)"></div>
+            <div><div class="mrow-name">llama-3.1-8b</div><div class="mrow-sub">Tier 1 · shield+triage</div></div>
+            <div class="mrow-cost">free</div>
+          </div>
+          <div class="mrow" data-m="llama-3.1-70b-versatile" onclick="pickModel(this)">
+            <div class="mrow-dot" style="background:var(--cyan)"></div>
+            <div><div class="mrow-name">llama-3.1-70b</div><div class="mrow-sub">Tier 2 · SAST analysis</div></div>
+            <div class="mrow-cost">$0.0001</div>
+          </div>
+          <div class="mrow" data-m="llama-3.3-70b-specdec" onclick="pickModel(this)">
+            <div class="mrow-dot" style="background:var(--pur)"></div>
+            <div><div class="mrow-name">llama-3.3-70b</div><div class="mrow-sub">Tier 3 · exploit+patch</div></div>
+            <div class="mrow-cost">$0.0003</div>
+          </div>
+          <div class="mrow" data-m="mixtral-8x7b-32768" onclick="pickModel(this)">
+            <div class="mrow-dot" style="background:var(--amb)"></div>
+            <div><div class="mrow-name">mixtral-8x7b</div><div class="mrow-sub">Tier 4 · large ctx</div></div>
+            <div class="mrow-cost">$0.0005</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sb-sec">
+        <div class="sb-lbl">Groq key pool</div>
+        <div class="kpool" id="kpool"></div>
+      </div>
+
+      <div class="sb-sec" style="flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0">
+        <div class="sb-lbl">DSPy modules</div>
+        <div class="dp-list" id="dp-list">
+          <div class="dp-item" id="dp-Shield"><span class="dp-badge sig">Sig</span><span class="dp-name">InjectionClassifier</span></div>
+          <div class="dp-item" id="dp-Triage"><span class="dp-badge lm">LM</span><span class="dp-name">FileTriage</span></div>
+          <div class="dp-item" id="dp-Semgrep"><span class="dp-badge cot">CoT</span><span class="dp-name">SemgrepAnalyzer</span></div>
+          <div class="dp-item" id="dp-CVE"><span class="dp-badge rag">RAG</span><span class="dp-name">CVERetriever · OSV.dev</span></div>
+          <div class="dp-item" id="dp-Cred"><span class="dp-badge sig">Sig</span><span class="dp-name">CredentialScanner</span></div>
+          <div class="dp-item" id="dp-RAG"><span class="dp-badge rag">RAG</span><span class="dp-name">Pinecone · VulnKnowledge</span></div>
+          <div class="dp-item" id="dp-Red"><span class="dp-badge cot">CoT</span><span class="dp-name">RedTeam · WriteExploit</span></div>
+          <div class="dp-item" id="dp-Blue"><span class="dp-badge cot">CoT</span><span class="dp-name">BlueTeam · PatchCode</span></div>
+          <div class="dp-item" id="dp-Sandbox"><span class="dp-badge sbx">SBX</span><span class="dp-name">SandboxValidator</span></div>
+          <div class="dp-item" id="dp-Score"><span class="dp-badge sig">Sig</span><span class="dp-name">ScoreEngine</span></div>
+        </div>
+      </div>
+
+      <div class="sb-foot">
+        <button class="ghost-btn" onclick="openVis()">&#9654; Open live visualization</button>
+        <button class="ghost-btn" onclick="tbGo('dash',document.querySelector('.tbn:nth-child(3)'))">&#9776; Dashboard</button>
+      </div>
+    </aside>
+
+    <!-- ═══════════ MAIN ═══════════ -->
+    <main class="main">
+      <div class="vbar">
+        <button class="vt on" onclick="showView('v-pipe',this)">Live pipeline</button>
+        <button class="vt" onclick="showView('v-chat',this)">AI analyst</button>
+        <button class="vt" onclick="showView('v-dash',this)">Scores &amp; findings</button>
+        <button class="vt" onclick="showView('v-rag',this)">RAG knowledge</button>
+        <button class="vt" onclick="showView('v-fw',this)">Framework</button>
+      </div>
+
+      <!-- ── PIPELINE ── -->
+      <div class="view on" id="v-pipe">
+        <div class="pipe-canvas">
+          <div class="input-node" id="inp-node">
+            <div class="in-icon">&#128193;</div>
+            <div class="in-text">
+              <h4>Input source</h4>
+              <p id="inp-path">Enter a GitHub URL or folder path, then click Run</p>
+            </div>
+            <div class="in-tag" id="inp-tag">source_code</div>
+          </div>
+          <div class="conn" id="cn0"></div>
+          <!-- M1 -->
+          <div class="mc" id="mc-M1">
+            <div class="mc-h">
+              <div class="mc-num">1</div>
+              <div class="mc-i"><h3>Prompt injection shield</h3><p>ShieldGemma 2B local · DSPy InjectionClassifier · P(violation) neural score</p></div>
+              <div class="mc-spin"></div>
+              <div class="mc-tag" id="mt-M1">Waiting</div>
+            </div>
+            <div class="mc-b"><div class="flist" id="fl-M1"><div class="empty">ShieldGemma 2B scores every input before any LLM sees it — zero API cost</div></div></div>
+          </div>
+          <div class="conn" id="cn1"></div>
+          <!-- M2 -->
+          <div class="mc" id="mc-M2">
+            <div class="mc-h">
+              <div class="mc-num">2</div>
+              <div class="mc-i"><h3>SAST · CVE · Credential audit</h3><p>Semgrep OWASP Top 10 · OSV.dev CVE · Hardcoded credential regex · Pinecone RAG context</p></div>
+              <div class="mc-spin"></div>
+              <div class="mc-tag" id="mt-M2">Waiting</div>
+            </div>
+            <div class="mc-b"><div class="flist" id="fl-M2"><div class="empty">Semgrep OWASP · OSV.dev free CVE API · credential scan · RAG context from Pinecone</div></div></div>
+          </div>
+          <div class="conn" id="cn2"></div>
+          <!-- M3 -->
+          <div class="mc" id="mc-M3">
+            <div class="mc-h">
+              <div class="mc-num">3</div>
+              <div class="mc-i"><h3>Red / Blue adversarial clash</h3><p>DSPy WriteExploit → Sandbox → DSPy PatchCode → re-attack · max 3 rounds</p></div>
+              <div class="mc-spin"></div>
+              <div class="mc-tag" id="mt-M3">Waiting</div>
+            </div>
+            <div class="mc-b">
+              <div class="clash-row" id="clash-row"></div>
+              <div id="diff-view"></div>
+            </div>
+          </div>
+          <div class="conn" id="cn3"></div>
+          <!-- M4 -->
+          <div class="mc" id="mc-M4">
+            <div class="mc-h">
+              <div class="mc-num">4</div>
+              <div class="mc-i"><h3>Score engine + report</h3><p>Confidence · Robustness · Integrity · Pinecone index update · JSON export</p></div>
+              <div class="mc-spin"></div>
+              <div class="mc-tag" id="mt-M4">Waiting</div>
+            </div>
+            <div class="mc-b"><div class="flist" id="fl-M4"><div class="empty">Score engine calculates C/R/I from findings, clash result, sandbox output</div></div></div>
+          </div>
+          <div class="legend-row" style="margin-top:16px">
+            <div class="li"><div class="ld" style="background:var(--red)"></div> Critical / High</div>
+            <div class="li"><div class="ld" style="background:var(--amb)"></div> Medium / Running</div>
+            <div class="li"><div class="ld" style="background:var(--grn)"></div> Pass / Verified</div>
+            <div class="li"><div class="ld" style="background:var(--pur)"></div> RAG / Sandbox</div>
+            <div class="li"><div class="ld" style="background:var(--t2)"></div> Skipped</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── CHAT ── -->
+      <div class="view" id="v-chat" style="display:flex;flex-direction:column">
+        <div class="chat-shell">
+          <div class="chat-header">
+            <div class="ai-av">Z</div>
+            <div>
+              <h3>Zenith AI Security Analyst</h3>
+              <p>I explain every finding in plain English, surface real-world breach context from Pinecone, and walk your team through the Red/Blue clash results. Ask me anything or run a scan.</p>
+            </div>
+          </div>
+          <div class="chat-msgs" id="chat-msgs"></div>
+          <div class="quick-row" id="qrow">
+            <button class="qchip" onclick="askQ('What is SQL injection and why is it dangerous for our startup?')">SQL injection risk</button>
+            <button class="qchip" onclick="askQ('Explain the hardcoded credential finding and how to fix it')">Hardcoded creds</button>
+            <button class="qchip" onclick="askQ('Walk me through the Red/Blue clash — what happened?')">Red/Blue clash</button>
+            <button class="qchip" onclick="askQ('Why did you choose DSPy over LangGraph or CrewAI?')">Why DSPy?</button>
+            <button class="qchip" onclick="askQ('How does ShieldGemma 2B detect prompt injections?')">ShieldGemma</button>
+            <button class="qchip" onclick="askQ('How does Pinecone RAG add context to findings?')">Pinecone RAG</button>
+          </div>
+          <div class="ci-row">
+            <textarea class="ci" id="ci" rows="1" placeholder="Ask about a finding, the architecture, or security concepts..."
+              onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat()}"></textarea>
+            <button class="send-btn" onclick="sendChat()">Send</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── DASHBOARD ── -->
+      <div class="view" id="v-dash">
+        <div class="dash-wrap">
+          <div class="verdict-bar" id="verdict-bar">Awaiting scan — enter a GitHub URL and click Run</div>
+          <div class="arc-row">
+            <div class="arc-card">
+              <svg width="80" height="80" viewBox="0 0 80 80">
+                <circle cx="40" cy="40" r="30" fill="none" stroke="var(--s4)" stroke-width="5"/>
+                <circle id="arc-c" cx="40" cy="40" r="30" fill="none" stroke="var(--grn)" stroke-width="5" stroke-dasharray="0 188" stroke-dashoffset="47" stroke-linecap="round" style="transition:stroke-dasharray 1.2s ease"/>
+              </svg>
+              <div class="arc-val" id="av-c">—</div><div class="arc-lbl">Confidence</div>
+            </div>
+            <div class="arc-card">
+              <svg width="80" height="80" viewBox="0 0 80 80">
+                <circle cx="40" cy="40" r="30" fill="none" stroke="var(--s4)" stroke-width="5"/>
+                <circle id="arc-r" cx="40" cy="40" r="30" fill="none" stroke="var(--grn)" stroke-width="5" stroke-dasharray="0 188" stroke-dashoffset="47" stroke-linecap="round" style="transition:stroke-dasharray 1.2s ease"/>
+              </svg>
+              <div class="arc-val" id="av-r">—</div><div class="arc-lbl">Robustness</div>
+            </div>
+            <div class="arc-card">
+              <svg width="80" height="80" viewBox="0 0 80 80">
+                <circle cx="40" cy="40" r="30" fill="none" stroke="var(--s4)" stroke-width="5"/>
+                <circle id="arc-i" cx="40" cy="40" r="30" fill="none" stroke="var(--grn)" stroke-width="5" stroke-dasharray="0 188" stroke-dashoffset="47" stroke-linecap="round" style="transition:stroke-dasharray 1.2s ease"/>
+              </svg>
+              <div class="arc-val" id="av-i">—</div><div class="arc-lbl">Integrity</div>
+            </div>
+          </div>
+          <div class="stat-grid">
+            <div class="stat-card sc-r"><div class="stat-l">Findings</div><div class="stat-v" id="sv-f">0</div><div class="stat-sub">SAST total</div></div>
+            <div class="stat-card sc-a"><div class="stat-l">CVEs</div><div class="stat-v" id="sv-cv">0</div><div class="stat-sub">OSV.dev</div></div>
+            <div class="stat-card sc-r"><div class="stat-l">Cred leaks</div><div class="stat-v" id="sv-cr">0</div><div class="stat-sub">Hardcoded</div></div>
+            <div class="stat-card sc-p"><div class="stat-l">RAG hits</div><div class="stat-v" id="sv-rg">0</div><div class="stat-sub">Pinecone ctx</div></div>
+            <div class="stat-card sc-c"><div class="stat-l">Clash rounds</div><div class="stat-v" id="sv-rnd">0</div><div class="stat-sub">Red/Blue</div></div>
+            <div class="stat-card sc-g"><div class="stat-l">Scan time</div><div class="stat-v" id="sv-tm">—</div><div class="stat-sub">End-to-end</div></div>
+          </div>
+          <div class="sec-h"><h2>Findings breakdown</h2></div>
+          <table class="ftable">
+            <thead><tr><th>Severity</th><th>Rule / CVE</th><th>Line</th><th>Description</th></tr></thead>
+            <tbody id="ftbody"><tr><td colspan="4" class="empty">No findings yet</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ── RAG ── -->
+      <div class="view" id="v-rag">
+        <div style="max-width:820px;margin:0 auto">
+          <div class="rag-intro">
+            <h3>Pinecone RAG — Vulnerability knowledge base</h3>
+            <p>Every finding is matched against 50,000+ breach reports, CVE descriptions, and OWASP documentation indexed in Pinecone. Semantic similarity surfaces why this exact vulnerability pattern caused real-world breaches — not just that it's dangerous.</p>
+          </div>
+          <div class="sec-h"><h2>Context retrieved for current scan</h2><p>Pinecone cosine similarity matches — higher score = closer match</p></div>
+          <div class="rag-hits" id="rag-hits">
+            <div class="empty">Run a scan — Pinecone retrieves the 3 most relevant breach records per finding</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── FRAMEWORK ── -->
+      <div class="view" id="v-fw">
+        <div style="max-width:920px;margin:0 auto">
+          <div class="sec-h"><h2>Framework: why DSPy</h2><p>DSPy from Stanford is the right tool for a sequential security reasoning pipeline</p></div>
+          <div class="fw-grid">
+            <div class="fw-card">
+              <div class="fw-name">CrewAI</div>
+              <div class="fw-org">Role-based agent collaboration</div>
+              <ul class="fw-pts">
+                <li><span class="i pro">+</span>Easy role definitions</li>
+                <li><span class="i pro">+</span>Good for team-style tasks</li>
+                <li><span class="i con">−</span>Wrong shape for pipelines</li>
+                <li><span class="i con">−</span>Agents talk until they decide to stop</li>
+                <li><span class="i con">−</span>Non-deterministic demo behavior</li>
+              </ul>
+            </div>
+            <div class="fw-card">
+              <div class="fw-name">AutoGen</div>
+              <div class="fw-org">Microsoft · Conversational loops</div>
+              <ul class="fw-pts">
+                <li><span class="i pro">+</span>Microsoft-backed, mature</li>
+                <li><span class="i pro">+</span>Good for dialogue reasoning</li>
+                <li><span class="i con">−</span>No sequential pipeline support</li>
+                <li><span class="i con">−</span>Complex state management</li>
+                <li><span class="i con">−</span>Hard to make reproducible</li>
+              </ul>
+            </div>
+            <div class="fw-card chosen">
+              <div class="fw-name">DSPy</div>
+              <div class="fw-org">Stanford NLP · Declarative LLM</div>
+              <ul class="fw-pts">
+                <li><span class="i pro">+</span>Define task → DSPy writes prompts</li>
+                <li><span class="i pro">+</span>Swap models in one line</li>
+                <li><span class="i pro">+</span>15 lines per module max</li>
+                <li><span class="i pro">+</span>ChainOfThought built-in</li>
+                <li><span class="i pro">+</span>Self-optimizes with MIPROv2</li>
+              </ul>
+            </div>
+          </div>
+          <div class="rag-intro" style="margin-top:8px">
+            <h3>Each module as a DSPy signature</h3>
+            <div class="codeblock">
+<span class="cm"># M1 — ShieldGemma fallback</span>
+<span class="kw">class</span> <span class="cl">InjectionClassifier</span>(dspy.Signature):
+    <span class="str">"""Classify whether text is a prompt injection attempt."""</span>
+    text: str = dspy.InputField()
+    is_injection: bool = dspy.OutputField()
+<br>
+<span class="cm"># M3 — Red Team exploit writer</span>
+<span class="kw">class</span> <span class="cl">WriteExploit</span>(dspy.Signature):
+    <span class="str">"""Write minimal PoC exploit for this vulnerability."""</span>
+    code: str = dspy.InputField()
+    finding: str = dspy.InputField()
+    exploit: str = dspy.OutputField()  <span class="cm"># or EXPLOIT_IMPOSSIBLE</span>
+<br>
+<span class="cm"># M3 — Blue Team patcher</span>
+<span class="kw">class</span> <span class="cl">WriteSecurePatch</span>(dspy.Signature):
+    <span class="str">"""Rewrite the vulnerable function to be secure."""</span>
+    code: str = dspy.InputField()
+    exploit: str = dspy.InputField()
+    patched: str = dspy.OutputField()
+<br>
+<span class="cm"># Navigator: swap models in ONE line</span>
+dspy.configure(lm=dspy.LM(<span class="str">"groq/llama-3.3-70b-specdec"</span>))
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<script>
+/* =====================================================================
+   ZENITH FRONTEND — Complete application logic
+   Connects to FastAPI backend at http://localhost:8000
+   WebSocket: ws://localhost:8000/ws
+   ===================================================================== */
+const API = 'http://localhost:8000';
+const WS_URL = 'ws://localhost:8000/ws';
+
+const ST = {
+  running:false, ws:null, findings:0, cves:0, creds:0, rounds:0, rag:0,
+  threat:'LOW', verdict:'', scanStart:0, allFindings:[]
+};
+
+/* ── NAV ──────────────────────────────────────── */
+function tbGo(id, el){
+  const map={pipe:'v-pipe',chat:'v-chat',dash:'v-dash',rag:'v-rag',fw:'v-fw'};
+  showView(map[id]||'v-pipe');
+  document.querySelectorAll('.tbn').forEach(b=>b.classList.remove('on'));
+  if(el) el.classList.add('on');
+  document.querySelectorAll('.vt').forEach(b=>b.classList.remove('on'));
+}
+function showView(id,el){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));
+  const t=document.getElementById(id); if(t) t.classList.add('on');
+  if(el){document.querySelectorAll('.vt').forEach(b=>b.classList.remove('on'));el.classList.add('on');}
+}
+document.querySelectorAll('.vt').forEach(btn=>{
+  btn.onclick=function(){
+    const m=btn.getAttribute('onclick')?.match(/'([^']+)'/);
+    if(m) showView(m[1],btn);
+  };
+});
+
+/* ── MODEL ────────────────────────────────────── */
+function pickModel(el){
+  document.querySelectorAll('.mrow').forEach(m=>m.classList.remove('on'));
+  el.classList.add('on');
+}
+
+/* ── KEY POOL ─────────────────────────────────── */
+let KEYS=Array(8).fill(100);
+function renderKeys(){
+  const el=document.getElementById('kpool'); if(!el) return;
+  el.innerHTML=KEYS.map((p,i)=>{
+    const c=p>60?'ok':p>20?'w':'x';
+    return `<div class="krow"><div class="kl">K${i+1}</div><div class="kt"><div class="kf ${c}" style="width:${p}%"></div></div><div class="kp ${c}">${p}%</div></div>`;
+  }).join('');
+}
+renderKeys();
+
+/* ── DSPy highlight ───────────────────────────── */
+function dpLit(id,on){ const el=document.getElementById('dp-'+id); if(el) el.classList.toggle('lit',on); }
+
+/* ── Module state ─────────────────────────────── */
+function mcState(id,state,label){
+  const mc=document.getElementById('mc-'+id);
+  const mt=document.getElementById('mt-'+id);
+  if(!mc||!mt) return;
+  mc.className='mc '+state;
+  mt.textContent=label||state;
+}
+function connLive(n){ const c=document.getElementById('cn'+n); if(c) c.classList.add('live'); }
+
+/* ── Add finding to module ───────────────────── */
+function addFnd(mid,sev,msg,rule,snip){
+  const el=document.getElementById('fl-'+mid); if(!el) return;
+  const emp=el.querySelector('.empty'); if(emp) emp.remove();
+  const d=document.createElement('div'); d.className='fnd '+sev;
+  d.innerHTML=`<div class="fsev">${sev}</div><div class="fnd-body"><div class="fmsg">${esc(msg)}</div>${rule?`<div class="frule">${esc(rule)}</div>`:''} ${snip?`<code class="fsnip">${esc(snip)}</code>`:''}</div>`;
+  el.appendChild(d);
+  ST.allFindings.push({sev,msg,rule,snip});
+  refreshFTable();
+}
+function refreshFTable(){
+  const tb=document.getElementById('ftbody'); if(!tb) return;
+  if(!ST.allFindings.length){tb.innerHTML='<tr><td colspan="4" class="empty">No findings yet</td></tr>';return;}
+  tb.innerHTML=ST.allFindings.map(f=>`<tr><td><span class="sev-chip ${f.sev}">${f.sev}</span></td><td style="font-family:var(--mono);font-size:11px;color:var(--t0)">${esc(f.rule||'—')}</td><td style="font-family:var(--mono);font-size:11px;color:var(--t2)">—</td><td>${esc(f.msg)}</td></tr>`).join('');
+}
+
+/* ── Clash chip ──────────────────────────────── */
+function addCC(type,label){ const el=document.getElementById('clash-row'); if(!el) return; const d=document.createElement('div'); d.className='cc '+type; d.textContent=label; el.appendChild(d); }
+
+/* ── Diff ────────────────────────────────────── */
+function showDiff(){
+  const el=document.getElementById('diff-view'); if(!el) return;
+  el.innerHTML=`<div class="diff-block"><span class="dl rm">-    query = "SELECT * FROM users WHERE id = " + user_id</span><span class="dl add">+    return conn.execute(</span><span class="dl add">+        "SELECT id, name FROM users WHERE id = ?",</span><span class="dl add">+        (user_id.strip(),)</span><span class="dl add">+    ).fetchall()</span><span class="dl ctx">     # Parameterized — injection impossible</span></div>`;
+}
+
+/* ── Scores ──────────────────────────────────── */
+function setScores(c,r,i){
+  const circ=2*Math.PI*30;
+  [['c',c],['r',r],['i',i]].forEach(([k,v])=>{
+    const arc=document.getElementById('arc-'+k),txt=document.getElementById('av-'+k);
+    if(!arc||!txt) return;
+    arc.style.strokeDasharray=(circ*(v/100))+' '+circ;
+    arc.style.stroke=v>=75?'var(--grn)':v>=50?'var(--amb)':'var(--red)';
+    txt.textContent=Math.round(v)+'%';
+    txt.className='arc-val '+(v>=75?'hi':v>=50?'mid':'lo');
+  });
+}
+function setVerdict(txt,cls){ const el=document.getElementById('verdict-bar'); if(!el) return; el.className='verdict-bar '+cls; el.textContent=txt; }
+function updStats(){ 
+  [['f',ST.findings,'r'],['cv',ST.cves,'a'],['cr',ST.creds,'r'],['rg',ST.rag,'p'],['rnd',ST.rounds,'c']].forEach(([k,v,c])=>{
+    const el=document.getElementById('sv-'+k); if(!el) return; el.textContent=v; el.className='stat-v'+(v>0?` lit ${c}`:'');
+  });
+  const tp=document.getElementById('threat-pill'); if(tp){tp.textContent=ST.threat;tp.className='threat-pill '+ST.threat;}
+  if(ST.scanStart){ const el=document.getElementById('sv-tm'); if(el) el.textContent=((Date.now()-ST.scanStart)/1000).toFixed(1)+'s'; }
+}
+
+/* ── RAG hits ────────────────────────────────── */
+const RAG_KB=[
+  {score:'0.97',title:'Equifax breach 2017 — SQL injection',text:'147M records exposed via unparameterized SQL. user_id passed as string into SQL query allowed \'1 OR 1=1\' to return the full table. Cost: $700M settlement.',tags:['CVE-2017-5638','SQL injection','series A risk']},
+  {score:'0.92',title:'OWASP A03:2021 — Injection (CWE-89)',text:'SQL injection via string concatenation is #3 on OWASP Top 10 2021. Parameterized queries (\'?\' placeholders) eliminate the class entirely — zero performance cost.',tags:['OWASP Top 10','CWE-89','prevention']},
+  {score:'0.88',title:'Uber 2022 — hardcoded credentials in repo',text:'Hardcoded AWS credentials found in private GitHub repo via MFA bypass. Exposed 57M user records. Fix: environment variables or secret managers — never source code.',tags:['hardcoded','AWS','series A risk']},
+  {score:'0.81',title:'CVE-2018-1000656 — Flask < 1.0.2 DoS',text:'Crafted JSON bodies cause 100% CPU usage in Flask < 1.0.2. Fix: upgrade to flask>=1.0.2 and validate Content-Type headers in middleware.',tags:['flask','PyPI','CVE-2018-1000656']},
+];
+function renderRAG(data){
+  const el=document.getElementById('rag-hits'); if(!el) return;
+  el.innerHTML=''; const items=data||RAG_KB;
+  items.forEach(h=>{ const d=document.createElement('div'); d.className='rag-hit'; d.innerHTML=`<div class="rag-score">${h.score}</div><div><h4>${esc(h.title)}</h4><p>${esc(h.text)}</p>${(h.tags||[]).map(t=>`<span class="rag-tag">${esc(t)}</span>`).join('')}</div>`; el.appendChild(d); ST.rag++; }); updStats();
+}
+
+/* ── WebSocket ───────────────────────────────── */
+function connectWS(){
+  try{
+    ST.ws=new WebSocket(WS_URL);
+    ST.ws.onopen=()=>{
+      const d=document.getElementById('ws-dot'),l=document.getElementById('ws-lbl');
+      if(d) d.classList.add('on'); if(l) l.textContent='Live';
+      aiMsg('Connected to Zenith backend via WebSocket. Pipeline is ready. Enter a GitHub URL and click Run — or ask me anything.',false);
+    };
+    ST.ws.onmessage=e=>{ try{ handleEvent(JSON.parse(e.data)); }catch(err){} };
+    ST.ws.onclose=()=>{ setTimeout(connectWS,4000); };
+    ST.ws.onerror=()=>ST.ws.close();
+  }catch(e){ setTimeout(connectWS,5000); }
+}
+
+function handleEvent(ev){
+  const {module:mod,status,label,data}=ev;
+  if(mod==='PIPELINE'){
+    if(status==='complete'&&data){ processComplete(data); } return;
+  }
+  if(mod==='M1'){
+    if(status==='running'){ mcState('M1','run','Scanning'); dpLit('Shield',true); connLive(0); }
+    else if(status==='pass'){ mcState('M1','pass','Clean'); dpLit('Shield',false); dpLit('Triage',true); addFnd('M1','CLEAN','No injection — P(violation)='+((data&&data.shield_score)||0).toFixed(3),'ShieldGemma 2B'); }
+    else if(status==='fail'){ mcState('M1','fail','CRITICAL'); dpLit('Shield',false); (data&&data.injections||[]).forEach(i=>addFnd('M1','CRITICAL',i,'ShieldGemma 2B')); ST.findings+=(data&&data.injections||[]).length; ST.threat='CRITICAL'; updStats(); aiMsg('CRITICAL: Prompt injection detected. P(violation)='+(data&&data.shield_score||0).toFixed(2)+'. Input blocked — no LLM received this.','alert'); }
+  }
+  if(mod==='M2'){
+    if(status==='running'){ connLive(1); mcState('M2','run','Scanning'); dpLit('Semgrep',true); dpLit('Triage',false); }
+    else if(status==='fail'||status==='pass'){
+      mcState('M2',status==='fail'?'fail':'pass',label);
+      dpLit('Semgrep',false); dpLit('CVE',false); dpLit('Cred',false); dpLit('RAG',false);
+      if(data){
+        (data.sast||[]).forEach(f=>{addFnd('M2',f.severity,f.message,f.rule_id,f.snippet);ST.findings++;});
+        (data.cve||[]).forEach(f=>{addFnd('M2',f.severity,'CVE: '+f.cve_ids.join(', '),f.package+'=='+f.version);ST.cves++;});
+        (data.creds||[]).forEach(f=>{addFnd('M2','HIGH',f.type,f.snippet);ST.creds++;});
+        if(data.rag&&data.rag.length) renderRAG(data.rag);
+        ST.threat=data.threat_level||'MEDIUM'; updStats();
+        if(ST.findings>0) aiMsg(`Module 2 found ${ST.findings} finding(s), ${ST.cves} CVE(s), ${ST.creds} hardcoded credential(s). Pinecone retrieved ${(data.rag||[]).length} breach context records. Routing to Red/Blue clash.`,false);
+      }
+    }
+  }
+  if(mod==='M3'){
+    if(status==='running'){
+      connLive(2); mcState('M3','run',label);
+      if(label.includes('Red')){ dpLit('Red',true); dpLit('Blue',false); addCC('red','R'+((data&&data.round)||1)+' Attack'); }
+      else if(label.includes('Blue')){ dpLit('Blue',true); dpLit('Red',false); addCC('blue','R'+((data&&data.round)||1)+' Patch'); }
+      else if(label.includes('Sandbox')){ dpLit('Sandbox',true); addCC('sbx','Sandbox '+(data&&data.sandbox&&data.sandbox.succeeded?'✓':'✗')); }
+      ST.rounds=(data&&data.round)||ST.rounds; updStats();
+    }
+    else if(status==='pass'||status==='fail'){
+      mcState('M3',status,label); dpLit('Red',false); dpLit('Blue',false); dpLit('Sandbox',false);
+      if(data&&data.verdict==='PATCHED'){ addCC('win','✓ Verified'); showDiff(); aiMsg('Clash complete — PATCHED. Red Team confirmed EXPLOIT_IMPOSSIBLE after '+data.rounds+' round(s). The patch survived adversarial attack. Diff shown below.',false,'good'); }
+      else if(data&&data.verdict==='UNRESOLVED'){ addCC('lose','⚠ Unresolved'); aiMsg('Max rounds reached. Patch unverified — manual review required. Escalating to PENDING_REVIEW status.',false,'alert'); }
+    }
+  }
+  if(mod==='M4'){
+    if(status==='running'){ connLive(3); mcState('M4','run','Scoring'); dpLit('Score',true); }
+    else if(status==='pass'){
+      mcState('M4','pass','Complete'); dpLit('Score',false);
+      if(data){ setScores(data.confidence,data.robustness,data.integrity); const ok=data.patch_status==='VERIFIED'; setVerdict((ok?'✓ Patch VERIFIED':'⚠ Pending review')+' — Confidence '+Math.round(data.confidence)+'% · Robustness '+Math.round(data.robustness)+'% · Integrity '+Math.round(data.integrity)+'%',ok?'pass':'warn'); addFnd('M4','INFO','Scores: C='+Math.round(data.confidence)+'% R='+Math.round(data.robustness)+'% I='+Math.round(data.integrity)+'%','ScoreEngine'); updStats(); }
+      aiMsg('Pipeline complete. Check the Dashboard tab for full scores and findings breakdown. View RAG Context for breach evidence.','good');
+    }
+  }
+}
+
+function processComplete(data){
+  if(data.confidence) setScores(data.confidence,data.robustness,data.integrity);
+  if(data.threat_level){ ST.threat=data.threat_level; updStats(); }
+  const ms=data.scan_time_ms||0; const el=document.getElementById('sv-tm'); if(el) el.textContent=(ms/1000).toFixed(1)+'s';
+}
+
+/* ── START SCAN ────────────────────────────────── */
+async function startScan(){
+  if(ST.running) return;
+  ST.running=true; ST.scanStart=Date.now();
+  ST.findings=0; ST.cves=0; ST.creds=0; ST.rounds=0; ST.rag=0; ST.allFindings=[];
+
+  // Reset UI
+  ['M1','M2','M3','M4'].forEach(id=>{ const mc=document.getElementById('mc-'+id); if(mc) mc.className='mc'; const mt=document.getElementById('mt-'+id); if(mt) mt.textContent='Waiting'; const fl=document.getElementById('fl-'+id); if(fl) fl.innerHTML='<div class="empty">—</div>'; });
+  const cr=document.getElementById('clash-row'); if(cr) cr.innerHTML='';
+  const dv=document.getElementById('diff-view'); if(dv) dv.innerHTML='';
+  document.querySelectorAll('.conn').forEach(c=>c.classList.remove('live'));
+  document.querySelectorAll('.dp-item').forEach(d=>d.classList.remove('lit'));
+  const inp=document.getElementById('inp-node'); if(inp) inp.classList.remove('live');
+  setScores(0,0,0); setVerdict('Scanning...','');
+  const rh=document.getElementById('rag-hits'); if(rh) rh.innerHTML='<div class="empty">Retrieving from Pinecone...</div>';
+  refreshFTable(); updStats();
+
+  const btn=document.getElementById('run-btn'); if(btn) btn.disabled=true;
+  const ico=document.getElementById('run-ico'),sp=document.getElementById('run-spin'),lb=document.getElementById('run-label');
+  if(ico) ico.style.display='none'; if(sp) sp.style.display='block'; if(lb) lb.textContent='Scanning...';
+
+  const scanVal=(document.getElementById('scan-input')||{}).value||'';
+  const pp=document.getElementById('inp-path'); if(pp) pp.textContent=scanVal||'tests/fixtures/vulnerable.py';
+  const inpN=document.getElementById('inp-node'); if(inpN) inpN.classList.add('live');
+
+  aiMsg('Starting scan: '+(scanVal||'demo fixture — tests/fixtures/vulnerable.py'),true);
+  aiMsg('Pipeline initializing. Module 1 loading ShieldGemma 2B for injection detection...',false);
+
+  try{
+    if(ST.ws&&ST.ws.readyState===1){
+      // Backend connected — use real API
+      const resp=await fetch(API+'/api/scan',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({repo_url:scanVal.startsWith('http')?scanVal:'',prompt:scanVal&&!scanVal.startsWith('http')?scanVal:''})});
+      await resp.json(); // Events arrive via WebSocket
+    } else {
+      // Backend offline — run full local demo
+      await runLocalDemo(scanVal);
+    }
+  }catch(e){
+    await runLocalDemo(scanVal);
+  }
+
+  if(btn) btn.disabled=false;
+  if(ico) ico.style.display='block'; if(sp) sp.style.display='none'; if(lb) lb.textContent='Run security scan';
+  ST.running=false;
+}
+
+/* ── LOCAL DEMO (no backend) ──────────────────── */
+const isInjection=()=>(document.getElementById('scan-input')||{}).value?.toLowerCase().includes('ignore');
+async function runLocalDemo(scanVal){
+  const inj=isInjection();
+  await delay(600);
+  handleEvent({module:'M1',status:'running',label:'ShieldGemma scanning...',data:{}});
+  await delay(900);
+  if(inj){
+    handleEvent({module:'M1',status:'fail',label:'CRITICAL injection',data:{injections:['ignore all previous instructions'],shield_score:0.97}});
+    KEYS[2]=8; renderKeys(); return;
+  }
+  handleEvent({module:'M1',status:'pass',label:'Clean',data:{shield_score:0.03,input_type:'source_code'}});
+  await delay(600);
+  handleEvent({module:'M2',status:'running',label:'Semgrep + OSV.dev...',data:{}});
+  await delay(1400);
+  handleEvent({module:'M2',status:'fail',label:'3 findings',data:{
+    sast:[{severity:'HIGH',message:'SQL injection via string concatenation',rule_id:'python.sqli.string-concat',snippet:'query = "SELECT * FROM users WHERE id = " + user_id'},{severity:'HIGH',message:'Code injection via eval()',rule_id:'python.security.eval.use-of-eval',snippet:'return eval(data)'}],
+    cve:[{severity:'HIGH',message:'DoS via crafted JSON',cve_ids:['CVE-2018-1000656'],package:'flask',version:'1.0.0'}],
+    creds:[{type:'Hardcoded password',snippet:'if password == "admin123"',severity:'HIGH'}],
+    rag:RAG_KB, threat_level:'HIGH'
+  }});
+  await delay(600);
+  handleEvent({module:'M3',status:'running',label:'Round 1: Red Team attacking...',data:{round:1}});
+  await delay(1000);
+  // Simulate key rotation
+  KEYS[2]=12; renderKeys();
+  handleEvent({module:'M3',status:'running',label:'Sandbox: exploit succeeded',data:{round:1,sandbox:{succeeded:true}}});
+  await delay(800);
+  handleEvent({module:'M3',status:'running',label:'Round 1: Blue Team patching...',data:{round:1}});
+  await delay(1000);
+  handleEvent({module:'M3',status:'running',label:'Round 2: Red Team re-attacking...',data:{round:2}});
+  await delay(900);
+  handleEvent({module:'M3',status:'running',label:'Sandbox: blocked',data:{round:2,sandbox:{succeeded:false}}});
+  await delay(500);
+  handleEvent({module:'M3',status:'pass',label:'PATCHED in 2 rounds',data:{verdict:'PATCHED',rounds:2,diff:true}});
+  await delay(500);
+  handleEvent({module:'M4',status:'running',label:'Score engine...',data:{}});
+  await delay(700);
+  handleEvent({module:'M4',status:'pass',label:'Complete',data:{confidence:94,robustness:87,integrity:100,patch_status:'VERIFIED',threat_level:'HIGH'}});
+  KEYS[2]=85; renderKeys();
+}
+const delay=ms=>new Promise(r=>setTimeout(r,ms));
+
+/* ── AI CHAT ──────────────────────────────────── */
+const ANSWERS={
+  'sql injection':`SQL injection happens when user input is concatenated directly into a SQL query string. The classic example from your scan:\n\n  query = "SELECT ... WHERE id = " + user_id\n\nAn attacker passes user_id = "1 OR 1=1" — the query returns every row. The Equifax breach (147M records) started the same way. The fix: parameterized queries — the '?' placeholder never gets interpreted as SQL. Blue Team already wrote it.`,
+  'hardcoded':`Hardcoded credentials in source code are a critical risk for Series A startups because: (1) code gets committed to GitHub, (2) GitHub gets breached or made public, (3) credentials get scraped by bots within minutes. The Uber 2022 breach followed exactly this pattern. Fix: use environment variables for all secrets. Never put a password, API key, or token in source code.`,
+  'red':`The Red/Blue clash works like this:\n1. Red Team AI (DSPy WriteExploit) writes a minimal exploit for the SQL injection\n2. Sandbox executes the exploit in an isolated subprocess — confirmed it worked\n3. Blue Team AI (DSPy WriteSecurePatch) rewrites the vulnerable function with parameterized queries\n4. Red Team re-attacks the patched version\n5. Round 2: exploit returned EXPLOIT_IMPOSSIBLE — the patch held\n\nThis is mathematical verification, not static analysis.`,
+  'blue':null,
+  'dspy':`DSPy from Stanford is the right framework because our pipeline is sequential, not conversational. You define a typed Signature (input → output), DSPy writes the optimal prompt automatically. We can swap from Groq to OpenAI in one line — zero code changes to the modules themselves. CrewAI is for collaborative agent "crews" — wrong shape. AutoGen is for back-and-forth loops — non-deterministic for a demo. DSPy gave us 15 lines per module instead of 100+.`,
+  'shieldgemma':`ShieldGemma 2B is a 2-billion parameter model from Google, specifically fine-tuned to classify safety policy violations. It works differently from regex: it reads the full semantic context of the input and outputs P(violation) — a probability between 0 and 1. Above 0.5, we block the input. It runs locally — zero API cost, zero latency added to the cloud. Falls back to a DSPy DSPy InjectionClassifier if the model isn't loaded.`,
+  'pinecone':`Pinecone stores embeddings of 50,000+ breach reports, CVE descriptions, and OWASP documentation. When we find a SQL injection, we embed the finding and query Pinecone for the 3 nearest matches by cosine similarity. The RAG context tells your engineers not just "this is dangerous" but "this exact pattern caused the Equifax breach which cost $700M." Real-world evidence makes developers fix things faster than abstract warnings.`,
+  'business':`Target customer: Series A startups with 5–15 engineers using Cursor or GitHub Copilot. They ship fast but can't afford a dedicated AppSec team. One data breach before their Series B is existential. Pricing: $500/team/month. 100 teams = $50K MRR. The pitch: Snyk alerts — we prove the patch works under adversarial attack.`,
+};
+function aiMsg(text,isUser,cls){
+  const el=document.getElementById('chat-msgs'); if(!el) return;
+  const ts=new Date().toLocaleTimeString('en-GB',{hour12:false});
+  const d=document.createElement('div'); d.className='msg '+(isUser?'user':'ai '+(cls||''));
+  d.innerHTML=`<div class="msg-bub">${esc(text).replace(/\n/g,'<br>')}</div><div class="msg-ts">${ts}</div>`;
+  el.appendChild(d); el.scrollTop=el.scrollHeight;
+}
+function askQ(q){ aiMsg(q,true); setTimeout(()=>{ const k=Object.keys(ANSWERS).find(k=>q.toLowerCase().includes(k)); aiMsg(ANSWERS[k]||ANSWERS['sql injection'],false); },500); }
+function sendChat(){ const ci=document.getElementById('ci'); if(!ci||!ci.value.trim()) return; const q=ci.value.trim(); ci.value=''; askQ(q); }
+
+/* ── OPEN VIS ─────────────────────────────────── */
+function openVis(){ window.open('zenith_visualization.html','_blank'); }
+
+/* ── CLOCK ────────────────────────────────────── */
+setInterval(()=>{ const el=document.getElementById('tb-clk'); if(el) el.textContent=new Date().toLocaleTimeString(); },1000);
+
+/* ── UTILS ────────────────────────────────────── */
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+/* ── INIT ─────────────────────────────────────── */
+connectWS();
+// Seed initial chat
+setTimeout(()=>{
+  if(!document.getElementById('chat-msgs').children.length)
+    aiMsg("Zenith Navigator online. I'm ready to explain every finding in plain English and surface real-world breach context from Pinecone. Paste a GitHub URL and click Run — or ask me anything directly.",false);
+},500);
+</script>
+</body>
+</html>

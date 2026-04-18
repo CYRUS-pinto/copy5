@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zenith — Live Security Pipeline</title>
+<style>
+:root {
+  --bg: #0a0c0f;
+  --surface: #111318;
+  --surface2: #181c24;
+  --border: #1e2535;
+  --text: #dde2f0;
+  --muted: #4a5570;
+  --cyan: #00d4ff;
+  --green: #3ddc84;
+  --red: #ff4560;
+  --amber: #ffb700;
+  --purple: #a78bfa;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, 'Segoe UI', sans-serif;
+  font-size: 14px;
+  overflow-x: hidden;
+}
+/* GRID BACKGROUND */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image:
+    linear-gradient(rgba(0,212,255,.012) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,212,255,.012) 1px, transparent 1px);
+  background-size: 36px 36px;
+  pointer-events: none; z-index: 0;
+}
+
+/* LAYOUT */
+.app { position: relative; z-index: 1; min-height: 100vh; display: grid; grid-template-rows: 56px 1fr; }
+
+/* HEADER */
+header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 24px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(10,12,15,.92);
+  backdrop-filter: blur(8px);
+}
+.logo { font-size: 18px; font-weight: 700; letter-spacing: -0.5px; color: #fff; }
+.logo em { color: var(--cyan); font-style: normal; }
+.status-pill {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 12px; color: var(--muted);
+  padding: 4px 12px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+}
+.status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); transition: background .3s; }
+.status-dot.live { background: var(--green); box-shadow: 0 0 6px var(--green); animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
+.header-right { display: flex; gap: 16px; align-items: center; }
+.timestamp { font-size: 11px; color: var(--muted); font-family: var(--font-mono); }
+
+/* MAIN GRID */
+.main { display: grid; grid-template-columns: 1fr 340px; gap: 0; height: calc(100vh - 56px); overflow: hidden; }
+
+/* LEFT: FLOWCHART */
+.flow-panel { padding: 24px; overflow-y: auto; }
+.flow-title { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 20px; }
+
+/* PIPELINE FLOW */
+.pipeline {
+  display: flex; flex-direction: column; gap: 0;
+  max-width: 640px; margin: 0 auto;
+}
+
+/* USER INPUT node */
+.input-node {
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 14px 20px;
+  text-align: center; font-size: 13px; font-weight: 500;
+  color: var(--muted); margin-bottom: 8px;
+}
+.input-node.active { border-color: var(--cyan); color: var(--cyan); }
+.input-file { font-family: var(--font-mono); font-size: 12px; color: var(--cyan); margin-top: 4px; }
+
+/* ARROW connector */
+.arrow { display: flex; justify-content: center; height: 28px; align-items: center; position: relative; }
+.arrow::before { content: ''; width: 1px; height: 100%; background: var(--border); position: absolute; }
+.arrow-head {
+  width: 0; height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 7px solid var(--border);
+  position: absolute; bottom: 0;
+  transition: border-top-color .3s;
+}
+.arrow.active::before { background: var(--cyan); }
+.arrow.active .arrow-head { border-top-color: var(--cyan); }
+
+/* MODULE CARD */
+.module-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: border-color .3s, box-shadow .3s;
+  margin-bottom: 8px;
+  position: relative;
+}
+.module-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: var(--border); transition: background .3s;
+}
+.module-card.running { border-color: var(--amber); }
+.module-card.running::before { background: var(--amber); }
+.module-card.pass { border-color: var(--green); }
+.module-card.pass::before { background: var(--green); }
+.module-card.fail { border-color: var(--red); }
+.module-card.fail::before { background: var(--red); }
+.module-card.skip { border-color: var(--muted); opacity: .6; }
+
+.module-header {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+}
+.module-num {
+  width: 28px; height: 28px; border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700;
+  background: var(--surface2); color: var(--muted);
+  flex-shrink: 0; transition: background .3s, color .3s;
+}
+.module-card.running .module-num { background: rgba(255,183,0,.15); color: var(--amber); }
+.module-card.pass .module-num { background: rgba(61,220,132,.15); color: var(--green); }
+.module-card.fail .module-num { background: rgba(255,69,96,.15); color: var(--red); }
+.module-card.skip .module-num { background: var(--surface2); color: var(--muted); }
+
+.module-name { font-size: 14px; font-weight: 500; flex: 1; }
+.module-status-badge {
+  font-size: 10px; letter-spacing: 1px; text-transform: uppercase;
+  padding: 3px 9px; border-radius: 4px;
+  border: 1px solid var(--border); color: var(--muted);
+  transition: all .3s;
+}
+.module-card.running .module-status-badge { border-color: var(--amber); color: var(--amber); background: rgba(255,183,0,.08); }
+.module-card.pass .module-status-badge { border-color: var(--green); color: var(--green); background: rgba(61,220,132,.08); }
+.module-card.fail .module-status-badge { border-color: var(--red); color: var(--red); background: rgba(255,69,96,.08); }
+.module-card.skip .module-status-badge { content: 'SKIP'; }
+
+/* SPINNER */
+.spinner {
+  width: 14px; height: 14px; border: 2px solid var(--border);
+  border-top-color: var(--amber);
+  border-radius: 50%; animation: spin .7s linear infinite;
+  display: none; flex-shrink: 0;
+}
+.module-card.running .spinner { display: block; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* MODULE BODY */
+.module-body { padding: 14px 18px; min-height: 48px; }
+.module-label { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+
+/* FINDINGS LIST */
+.findings { display: flex; flex-direction: column; gap: 6px; }
+.finding-item {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid;
+  font-size: 12px; line-height: 1.5;
+  transition: all .2s;
+}
+.finding-item.critical { background: rgba(255,69,96,.08); border-color: rgba(255,69,96,.3); }
+.finding-item.high { background: rgba(255,69,96,.06); border-color: rgba(255,69,96,.2); }
+.finding-item.medium { background: rgba(255,183,0,.06); border-color: rgba(255,183,0,.2); }
+.finding-item.low { background: rgba(0,212,255,.04); border-color: rgba(0,212,255,.15); }
+.finding-item.clean { background: rgba(61,220,132,.06); border-color: rgba(61,220,132,.2); }
+.finding-sev {
+  font-size: 10px; font-weight: 700; letter-spacing: .5px;
+  text-transform: uppercase; padding: 2px 6px; border-radius: 3px;
+  flex-shrink: 0; margin-top: 1px;
+}
+.critical .finding-sev { background: rgba(255,69,96,.2); color: var(--red); }
+.high .finding-sev { background: rgba(255,69,96,.15); color: var(--red); }
+.medium .finding-sev { background: rgba(255,183,0,.15); color: var(--amber); }
+.low .finding-sev { background: rgba(0,212,255,.1); color: var(--cyan); }
+.clean .finding-sev { background: rgba(61,220,132,.15); color: var(--green); }
+.finding-text { color: var(--text); }
+.finding-rule { color: var(--muted); font-family: var(--font-mono); font-size: 11px; }
+
+/* CLASH ROUNDS */
+.clash-rounds { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+.clash-round {
+  display: flex; align-items: center; gap: 6px;
+  padding: 5px 10px; border-radius: 5px; font-size: 12px;
+  border: 1px solid var(--border);
+}
+.clash-round.red { background: rgba(255,69,96,.08); border-color: rgba(255,69,96,.25); color: var(--red); }
+.clash-round.blue { background: rgba(0,212,255,.07); border-color: rgba(0,212,255,.2); color: var(--cyan); }
+.clash-round.verified { background: rgba(61,220,132,.08); border-color: rgba(61,220,132,.25); color: var(--green); }
+
+/* SCORE BAR */
+.score-arc { text-align: center; }
+.score-arc svg { display: block; margin: 0 auto 6px; }
+.score-val { font-size: 26px; font-weight: 700; line-height: 1; }
+.score-lbl { font-size: 11px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
+
+/* RIGHT PANEL */
+.right-panel {
+  border-left: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  overflow: hidden;
+  background: var(--surface);
+}
+
+/* SCORES SECTION */
+.scores-section { padding: 18px; border-bottom: 1px solid var(--border); }
+.section-label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; }
+.score-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.score-card { text-align: center; }
+.score-card .val { font-size: 28px; font-weight: 700; line-height: 1; margin-bottom: 4px; transition: all .5s; }
+.score-card .lbl { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+.score-green { color: var(--green); }
+.score-amber { color: var(--amber); }
+.score-red { color: var(--red); }
+.score-muted { color: var(--muted); }
+
+/* VERDICT BADGE */
+.verdict-box {
+  margin-top: 14px; padding: 10px 14px; border-radius: 6px;
+  display: flex; align-items: center; gap: 10px;
+  border: 1px solid var(--border);
+  font-size: 13px; font-weight: 500;
+  transition: all .5s;
+}
+.verdict-box.verified { background: rgba(61,220,132,.08); border-color: rgba(61,220,132,.3); color: var(--green); }
+.verdict-box.unresolved { background: rgba(255,183,0,.08); border-color: rgba(255,183,0,.3); color: var(--amber); }
+.verdict-box.pending { background: var(--surface2); color: var(--muted); }
+
+/* STATS GRID */
+.stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 16px; border-bottom: 1px solid var(--border); }
+.stat-item { background: var(--surface2); border-radius: 6px; padding: 10px; }
+.stat-item .n { font-size: 20px; font-weight: 700; line-height: 1; margin-bottom: 3px; }
+.stat-item .l { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+
+/* EVENT LOG */
+.log-section { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.log-header { padding: 12px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; }
+.log-title { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); }
+.clear-btn { margin-left: auto; font-size: 11px; color: var(--muted); cursor: pointer; padding: 2px 8px; border: 1px solid var(--border); border-radius: 3px; background: none; transition: all .2s; }
+.clear-btn:hover { border-color: var(--cyan); color: var(--cyan); }
+.log-entries { flex: 1; overflow-y: auto; padding: 8px; scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
+.log-entry {
+  display: flex; gap: 8px; padding: 5px 8px;
+  border-radius: 4px; font-size: 12px; line-height: 1.5;
+  margin-bottom: 2px; transition: background .2s;
+}
+.log-entry:hover { background: var(--surface2); }
+.log-time { font-family: var(--font-mono); font-size: 10px; color: var(--muted); flex-shrink: 0; padding-top: 2px; }
+.log-msg { color: var(--text); flex: 1; }
+.log-entry.run .log-msg { color: var(--amber); }
+.log-entry.pass .log-msg { color: var(--green); }
+.log-entry.fail .log-msg { color: var(--red); }
+.log-entry.skip .log-msg { color: var(--muted); font-style: italic; }
+.log-entry.finding .log-msg { color: var(--red); }
+.log-entry.complete .log-msg { color: var(--cyan); font-weight: 500; }
+
+/* RECONNECT BANNER */
+.reconnect-banner {
+  position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%);
+  background: var(--amber); color: #000; padding: 8px 20px; border-radius: 6px;
+  font-size: 13px; font-weight: 500; display: none; z-index: 100;
+}
+.reconnect-banner.visible { display: block; }
+
+/* COLOUR LEGEND */
+.legend {
+  display: flex; gap: 12px; flex-wrap: wrap;
+  padding: 10px 16px; border-top: 1px solid var(--border);
+  font-size: 11px; color: var(--muted);
+}
+.legend-item { display: flex; align-items: center; gap: 4px; }
+.legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="logo">ZENITH<em>.</em></div>
+    <div class="header-right">
+      <div class="status-pill" id="conn-pill">
+        <div class="status-dot" id="conn-dot"></div>
+        <span id="conn-label">Connecting...</span>
+      </div>
+      <div class="timestamp" id="clock"></div>
+    </div>
+  </header>
+
+  <div class="main">
+    <!-- LEFT: PIPELINE FLOWCHART -->
+    <div class="flow-panel">
+      <div class="flow-title">Live pipeline · Security analysis flowchart</div>
+
+      <div class="pipeline">
+        <!-- INPUT -->
+        <div class="input-node" id="node-input">
+          User input
+          <div class="input-file" id="input-file-label">Waiting for scan...</div>
+        </div>
+
+        <div class="arrow" id="arr-0"><div class="arrow-head"></div></div>
+
+        <!-- MODULE 1 -->
+        <div class="module-card" id="card-M1">
+          <div class="module-header">
+            <div class="module-num">1</div>
+            <div class="module-name">Ingress + ShieldGemma Shield</div>
+            <div class="spinner"></div>
+            <div class="module-status-badge" id="badge-M1">Waiting</div>
+          </div>
+          <div class="module-body">
+            <div class="module-label" id="label-M1">ShieldGemma 2B injection detection + file triage</div>
+            <div class="findings" id="findings-M1"></div>
+          </div>
+        </div>
+
+        <div class="arrow" id="arr-1"><div class="arrow-head"></div></div>
+
+        <!-- MODULE 2 -->
+        <div class="module-card" id="card-M2">
+          <div class="module-header">
+            <div class="module-num">2</div>
+            <div class="module-name">SAST + CVE Scanner</div>
+            <div class="spinner"></div>
+            <div class="module-status-badge" id="badge-M2">Waiting</div>
+          </div>
+          <div class="module-body">
+            <div class="module-label" id="label-M2">Semgrep OWASP scan + OSV.dev CVE check</div>
+            <div class="findings" id="findings-M2"></div>
+          </div>
+        </div>
+
+        <div class="arrow" id="arr-2"><div class="arrow-head"></div></div>
+
+        <!-- MODULE 3 -->
+        <div class="module-card" id="card-M3">
+          <div class="module-header">
+            <div class="module-num">3</div>
+            <div class="module-name">Red / Blue Adversarial Clash</div>
+            <div class="spinner"></div>
+            <div class="module-status-badge" id="badge-M3">Waiting</div>
+          </div>
+          <div class="module-body">
+            <div class="module-label" id="label-M3">DSPy Red Team exploits · Blue Team patches · Re-attack</div>
+            <div class="findings" id="findings-M3"></div>
+          </div>
+        </div>
+
+        <div class="arrow" id="arr-3"><div class="arrow-head"></div></div>
+
+        <!-- MODULE 4 -->
+        <div class="module-card" id="card-M4">
+          <div class="module-header">
+            <div class="module-num">4</div>
+            <div class="module-name">Verify + Score + Dashboard</div>
+            <div class="spinner"></div>
+            <div class="module-status-badge" id="badge-M4">Waiting</div>
+          </div>
+          <div class="module-body">
+            <div class="module-label" id="label-M4">Score engine · Report · Live results</div>
+            <div class="findings" id="findings-M4"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- COLOUR LEGEND -->
+      <div class="legend">
+        <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div> Critical / High</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--amber)"></div> Medium / Running</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div> Pass / Verified</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--muted)"></div> Skipped</div>
+      </div>
+    </div>
+
+    <!-- RIGHT: SCORES + LOG -->
+    <div class="right-panel">
+      <div class="scores-section">
+        <div class="section-label">Security scores</div>
+        <div class="score-grid">
+          <div class="score-card">
+            <div class="val score-muted" id="sc-conf">—</div>
+            <div class="lbl">Confidence</div>
+          </div>
+          <div class="score-card">
+            <div class="val score-muted" id="sc-rob">—</div>
+            <div class="lbl">Robustness</div>
+          </div>
+          <div class="score-card">
+            <div class="val score-muted" id="sc-int">—</div>
+            <div class="lbl">Integrity</div>
+          </div>
+        </div>
+        <div class="verdict-box pending" id="verdict-box">
+          Pipeline running...
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-item"><div class="n score-muted" id="stat-findings">0</div><div class="l">Findings</div></div>
+        <div class="stat-item"><div class="n score-muted" id="stat-cves">0</div><div class="l">CVEs</div></div>
+        <div class="stat-item"><div class="n score-muted" id="stat-rounds">0</div><div class="l">Clash rounds</div></div>
+        <div class="stat-item"><div class="n score-muted" id="stat-threat">LOW</div><div class="l">Threat</div></div>
+      </div>
+
+      <div class="log-section">
+        <div class="log-header">
+          <div class="log-title">Event log</div>
+          <button class="clear-btn" onclick="clearLog()">Clear</button>
+        </div>
+        <div class="log-entries" id="log-entries"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="reconnect-banner" id="reconnect-banner">
+  WebSocket disconnected — reconnecting...
+</div>
+
+<script>
+const WS_URL = 'ws://localhost:8765';
+let ws = null;
+let reconnectTimer = null;
+let statsState = { findings: 0, cves: 0, rounds: 0, threat: 'LOW' };
+
+// Clock
+setInterval(() => {
+  document.getElementById('clock').textContent = new Date().toLocaleTimeString();
+}, 1000);
+
+// ── WebSocket connection ────────────────────────────────────────────────────
+function connect() {
+  try {
+    ws = new WebSocket(WS_URL);
+
+    ws.onopen = () => {
+      document.getElementById('conn-dot').classList.add('live');
+      document.getElementById('conn-label').textContent = 'Live';
+      document.getElementById('reconnect-banner').classList.remove('visible');
+      addLog('complete', 'Connected to Zenith pipeline');
+      clearInterval(reconnectTimer);
+    };
+
+    ws.onmessage = (e) => {
+      try {
+        const event = JSON.parse(e.data);
+        handleEvent(event);
+      } catch {}
+    };
+
+    ws.onclose = () => {
+      document.getElementById('conn-dot').classList.remove('live');
+      document.getElementById('conn-label').textContent = 'Disconnected';
+      document.getElementById('reconnect-banner').classList.add('visible');
+      addLog('skip', 'Connection lost — reconnecting in 3s...');
+      reconnectTimer = setTimeout(connect, 3000);
+    };
+
+    ws.onerror = () => ws.close();
+  } catch (e) {
+    addLog('skip', 'Cannot connect to ws://localhost:8765 — run core_cli.py first');
+    setTimeout(connect, 5000);
+  }
+}
+
+// ── Event handler ────────────────────────────────────────────────────────────
+function handleEvent(ev) {
+  const { module, status, label, data } = ev;
+  addLog(status, `[${module}] ${label}`);
+
+  if (module === 'PIPELINE') {
+    if (status === 'running' && data && data.file) {
+      document.getElementById('input-file-label').textContent = data.file;
+      document.getElementById('node-input').classList.add('active');
+    }
+    if (status === 'complete' && data) {
+      updateStats(data);
+    }
+    return;
+  }
+
+  const moduleIdx = { M1: 0, M2: 1, M3: 2, M4: 3 };
+  const idx = moduleIdx[module];
+
+  // Update card state
+  const card = document.getElementById('card-' + module);
+  const badge = document.getElementById('badge-' + module);
+  const labelEl = document.getElementById('label-' + module);
+
+  if (!card) return;
+
+  card.classList.remove('running', 'pass', 'fail', 'skip');
+
+  if (status === 'running') {
+    card.classList.add('running');
+    badge.textContent = 'Running';
+    if (label) labelEl.textContent = label;
+    // Activate arrow above
+    if (idx > 0) document.getElementById('arr-' + (idx - 1)).classList.add('active');
+    else document.getElementById('arr-0').classList.add('active');
+    document.getElementById('arr-' + idx)?.classList.add('active');
+
+  } else if (status === 'pass' || status === 'complete') {
+    card.classList.add('pass');
+    badge.textContent = 'Pass';
+    // Render pass data
+    if (data) renderModuleData(module, data);
+    if (data && data.confidence !== undefined) updateScores(data);
+
+  } else if (status === 'fail') {
+    card.classList.add('fail');
+    badge.textContent = 'Fail';
+
+  } else if (status === 'skip') {
+    card.classList.add('skip');
+    badge.textContent = 'Skip';
+
+  } else if (status === 'finding') {
+    // Add finding to current module card
+    addFinding(module, data);
+    statsState.findings++;
+    if (data.cve_ids) statsState.cves++;
+    updateStatsDisplay();
+  }
+}
+
+// ── Render module-specific data ──────────────────────────────────────────────
+function renderModuleData(module, data) {
+  const el = document.getElementById('findings-' + module);
+  if (!el) return;
+
+  if (module === 'M1') {
+    const inj = data.injections || 0;
+    const score = data.shield_score || 0;
+    el.innerHTML = inj > 0
+      ? `<div class="finding-item critical"><span class="finding-sev">CRITICAL</span><div class="finding-text">Injection detected — P(violation)=${score}<br><span class="finding-rule">${inj} pattern(s) matched</span></div></div>`
+      : `<div class="finding-item clean"><span class="finding-sev">CLEAN</span><div class="finding-text">No injections — P(violation)=${score}<br><span class="finding-rule">${data.input_type || 'source_code'}</span></div></div>`;
+  }
+
+  if (module === 'M2') {
+    const findings = data.findings || [];
+    if (findings.length === 0 && (data.sast_count || 0) === 0) {
+      el.innerHTML = '<div class="finding-item clean"><span class="finding-sev">CLEAN</span><div class="finding-text">No vulnerabilities found</div></div>';
+    }
+  }
+
+  if (module === 'M3') {
+    const verdict = data.verdict || '';
+    const rounds = data.rounds || 0;
+    const attacksHtml = Array.from({length: data.red_attacks || 0}, (_, i) =>
+      `<div class="clash-round red">🔴 Attack ${i+1}</div>`
+    ).join('');
+    const patchesHtml = Array.from({length: data.blue_patches || 0}, (_, i) =>
+      `<div class="clash-round blue">🔵 Patch ${i+1}</div>`
+    ).join('');
+    const verdictHtml = verdict === 'PATCHED'
+      ? `<div class="clash-round verified">✓ Verified</div>` : '';
+    el.innerHTML = `<div class="clash-rounds">${attacksHtml}${patchesHtml}${verdictHtml}</div>`;
+    statsState.rounds = rounds;
+    updateStatsDisplay();
+  }
+
+  if (module === 'M4') {
+    if (data.confidence !== undefined) updateScores(data);
+  }
+}
+
+// ── Add finding to module ────────────────────────────────────────────────────
+function addFinding(module, finding) {
+  const el = document.getElementById('findings-' + module);
+  if (!el) return;
+  const sev = (finding.severity || 'INFO').toLowerCase();
+  const html = `<div class="finding-item ${sev}">
+    <span class="finding-sev">${sev.toUpperCase()}</span>
+    <div class="finding-text">${escHtml(finding.message || finding.summary || 'Vulnerability')}
+    <br><span class="finding-rule">${escHtml(finding.rule_id || finding.package || '')}</span></div>
+  </div>`;
+  el.insertAdjacentHTML('beforeend', html);
+}
+
+// ── Update score display ─────────────────────────────────────────────────────
+function updateScores(data) {
+  const conf = Math.round(data.confidence || 0);
+  const rob  = Math.round(data.robustness || 0);
+  const int_ = Math.round(data.integrity  || 0);
+  const verdict = data.verdict || '';
+
+  document.getElementById('sc-conf').textContent = conf + '%';
+  document.getElementById('sc-conf').className = 'val ' + scoreClass(conf);
+  document.getElementById('sc-rob').textContent = rob + '%';
+  document.getElementById('sc-rob').className = 'val ' + scoreClass(rob);
+  document.getElementById('sc-int').textContent = int_ + '%';
+  document.getElementById('sc-int').className = 'val ' + scoreClass(int_);
+
+  const box = document.getElementById('verdict-box');
+  box.classList.remove('verified', 'unresolved', 'pending');
+  if (verdict === 'VERIFIED') {
+    box.className = 'verdict-box verified';
+    box.textContent = '✓ Patch verified — pipeline complete';
+  } else if (verdict === 'PENDING_REVIEW') {
+    box.className = 'verdict-box unresolved';
+    box.textContent = '⚠ Unresolved — manual review needed';
+  } else {
+    box.className = 'verdict-box pending';
+    box.textContent = verdict || 'Pipeline running...';
+  }
+}
+
+function updateStats(data) {
+  if (data.sast_findings) statsState.findings = data.sast_findings.length;
+  if (data.cve_findings)  statsState.cves = data.cve_findings.length;
+  if (data.clash_rounds)  statsState.rounds = data.clash_rounds;
+  if (data.threat_level)  statsState.threat = data.threat_level;
+  updateStatsDisplay();
+  if (data.confidence) updateScores({ ...data, verdict: data.patch_status });
+}
+
+function updateStatsDisplay() {
+  document.getElementById('stat-findings').textContent = statsState.findings;
+  document.getElementById('stat-cves').textContent = statsState.cves;
+  document.getElementById('stat-rounds').textContent = statsState.rounds;
+  const threatEl = document.getElementById('stat-threat');
+  threatEl.textContent = statsState.threat;
+  threatEl.className = 'n ' + {CRITICAL:'score-red',HIGH:'score-red',MEDIUM:'score-amber',LOW:'score-green'}[statsState.threat] || 'score-muted';
+}
+
+// ── Event log ────────────────────────────────────────────────────────────────
+function addLog(status, message) {
+  const el = document.getElementById('log-entries');
+  const time = new Date().toLocaleTimeString('en-GB', { hour12: false });
+  const entry = document.createElement('div');
+  entry.className = 'log-entry ' + status;
+  entry.innerHTML = `<span class="log-time">${time}</span><span class="log-msg">${escHtml(message)}</span>`;
+  el.insertBefore(entry, el.firstChild);
+  // Keep last 100 entries
+  while (el.children.length > 100) el.removeChild(el.lastChild);
+}
+
+function clearLog() {
+  document.getElementById('log-entries').innerHTML = '';
+}
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+function scoreClass(n) {
+  return n >= 75 ? 'score-green' : n >= 50 ? 'score-amber' : 'score-red';
+}
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+connect();
+document.getElementById('clock').textContent = new Date().toLocaleTimeString();
+addLog('pass', 'Dashboard loaded — waiting for pipeline...');
+</script>
+</body>
+</html>
